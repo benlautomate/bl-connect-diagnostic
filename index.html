@@ -280,6 +280,46 @@ main{flex:1; display:flex; justify-content:center; padding:2rem 1.375rem 4rem}
 .reco-item.cadrage .reco-tag{color:#a97a26; background:var(--amber-050)}
 .reco-tag.ent{color:var(--marine); background:#e6eef7}
 
+/* ---------- vie de l ecran de resultat ---------- */
+#s-result > *{opacity:0; animation:blocIn .55s cubic-bezier(.16,1,.3,1) forwards}
+#s-result > *:nth-child(1){animation-delay:.05s}
+#s-result > *:nth-child(2){animation-delay:.35s}
+#s-result > *:nth-child(3){animation-delay:.55s}
+#s-result > *:nth-child(4){animation-delay:.7s}
+@keyframes blocIn{from{opacity:0; transform:translateY(18px) scale(.985)} to{opacity:1; transform:none}}
+
+.shock{position:relative}
+.shock::after{
+  content:""; position:absolute; left:8%; top:-30%; width:min(420px,80%); aspect-ratio:1;
+  border-radius:50%; pointer-events:none; z-index:0;
+  background:radial-gradient(circle, rgba(70,189,236,.34), transparent 66%);
+  animation:respire 6s ease-in-out infinite;
+}
+@keyframes respire{0%,100%{opacity:.55; transform:scale(1)} 50%{opacity:1; transform:scale(1.12)}}
+.hugenum{position:relative; z-index:1}
+.hugewrap{position:relative; z-index:1}
+
+/* la barre de poids : combien cette piste pese dans le total */
+.poids{
+  position:relative; height:6px; border-radius:4px; background:var(--line-soft);
+  margin-top:.75rem; overflow:hidden;
+}
+.poids span{
+  position:absolute; inset:0 auto 0 0; width:0; border-radius:4px;
+  background:linear-gradient(90deg,var(--cyan),var(--cyan-400));
+  transition:width 1.1s cubic-bezier(.22,1,.36,1);
+}
+.reco-item.amb .poids span{background:linear-gradient(90deg,#c9922f,var(--amber-2))}
+.reco-item{transition:background .2s}
+.reco-item:hover{background:var(--surface-soft)}
+.reco-item.first:hover{background:linear-gradient(150deg, rgba(5,159,217,.14), rgba(255,255,255,0) 62%)}
+.reco-n{transition:transform .2s}
+.reco-item:hover .reco-n{transform:scale(1.06)}
+
+/* le montant respire une fois pose */
+.hugenum.pose{animation:pose .5s cubic-bezier(.16,1,.3,1)}
+@keyframes pose{0%{transform:scale(1)}45%{transform:scale(1.035)}100%{transform:scale(1)}}
+
 /* ---------- pistes ---------- */
 .reco{padding:0; overflow:hidden; background:linear-gradient(180deg,#fbfdff,#f5f9fd); border-color:var(--line)}
 .reco-head{padding:1.5rem 1.5rem 1.125rem; border-bottom:1px solid var(--line)}
@@ -1170,6 +1210,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       var e = 1 - Math.pow(1 - p, 3);
       node.textContent = nf(Math.round(target * e)) + suffix;
       if (p < 1) requestAnimationFrame(step);
+      else if (node.classList) node.classList.add("pose");
     }
     requestAnimationFrame(step);
   }
@@ -1402,7 +1443,9 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
 
     var ro = el("recoList");
     ro.innerHTML = "";
-    buildRecos(R).forEach(function (r, i) {
+    var pistes = buildRecos(R);
+    var maxEur = Math.max.apply(null, pistes.map(function (p) { return p.eur || 0; })) || 1;
+    pistes.forEach(function (r, i) {
       var li = document.createElement("li");
       li.className = "reco-item" + (i === 0 ? " first" : "");
       var chaudTag = r.pre || r.g === "Cadrage" || r.g === "Formation" || r.g === "IA d\u2019entreprise" || r.g === "IA d'entreprise";
@@ -1418,7 +1461,9 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
         (r.eur ? '<span class="gain' + (R.v.key === "amont" ? " cond" : "") + '">' +
           nf(r.eur) + " \u2192 " + nf(r.eurHi) + ' \u20ac / an' +
           (R.v.key === "amont" ? '<em>une fois l\u2019information atteignable</em>' : '') + '</span>' : '') +
-        '<span class="effort ' + r.ef + '">' + EFFORT[r.ef] + '</span></span></span>';
+        '<span class="effort ' + r.ef + '">' + EFFORT[r.ef] + '</span></span>' +
+        (r.eur ? '<span class="poids"><span data-w="' + Math.round(r.eur / maxEur * 100) + '"></span></span>' : '') +
+        '</span>';
       ro.appendChild(li);
     });
 
@@ -1434,6 +1479,12 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
         '<span class="small">Nous vérifions avant d\u2019annoncer.</span></div>';
     }
     el("extraNotes").innerHTML = notes;
+
+    setTimeout(function () {
+      ro.querySelectorAll(".poids span").forEach(function (b) {
+        b.style.width = Math.max(6, +b.dataset.w) + "%";
+      });
+    }, 700);
 
     el("ctaRdv").href = CONFIG.rdv;
     el("ctaTop").href = CONFIG.rdv;
