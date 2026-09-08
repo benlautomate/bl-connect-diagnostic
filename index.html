@@ -434,11 +434,14 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
 
       <section class="screen" id="s-tache" hidden>
         <div class="head"><span class="eyebrow">Question 2</span>
-          <h2 class="q">Laquelle de ces tâches vous semble <em>idiote à refaire</em> à chaque fois&nbsp;?</h2>
+          <h2 class="q">Lesquelles vous semblent <span class="hl">idiotes à refaire</span> à chaque fois&nbsp;?</h2>
         </div>
-        <p class="hint">Une seule, la plus pénible.</p>
+        <p class="hint">Jusqu’à trois, les plus pénibles.</p>
         <div class="opts" id="optsTache"></div>
-        <button class="back" data-back="metier">Revenir</button>
+        <div class="actions">
+          <button class="cta" id="tacheNext" disabled data-go="rythme">Continuer</button>
+          <button class="back" data-back="metier">Revenir</button>
+        </div>
       </section>
 
       <section class="screen" id="s-rythme" hidden>
@@ -447,11 +450,11 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
         </div>
         <p class="hint">Une estimation suffit.</p>
         <div class="pair">
-          <span class="pair-lab">Nombre de fois par semaine</span>
+          <span class="pair-lab">Au total, nombre de fois par semaine</span>
           <div class="chips" id="chipsFreq"></div>
         </div>
         <div class="pair">
-          <span class="pair-lab">Temps à chaque fois</span>
+          <span class="pair-lab">Temps moyen à chaque fois</span>
           <div class="chips" id="chipsDuree"></div>
         </div>
         <div class="actions">
@@ -821,7 +824,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
   /* =======================================================================
      ÉTAT
      ======================================================================= */
-  var A = { metier:null, tache:null, freq:null, duree:null, donnees:[],
+  var A = { metier:null, taches:[], freq:null, duree:null, donnees:[],
             etapes:null, volume:null, equipes:null,
             taux:null, dept:null, suite:null };
 
@@ -975,10 +978,16 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       return { id:"t" + i, label:t.label, type:t.t, icon:t.t };
     });
     list.push({ id:"tx", label:"Une autre tâche qui revient chez moi", type:"entrant", icon:"autre" });
-    buildOpts(el("optsTache"), list, { round:true, onPick: function (it, b, c) {
-      A.tache = it; single(c, b);
-      el("rythmeQ").innerHTML = "«&nbsp;" + it.label + "&nbsp;»<br>Combien de fois, et combien de temps&nbsp;?";
-      setTimeout(function () { show("rythme"); }, 120);
+    buildOpts(el("optsTache"), list, { onPick: function (it, b) {
+      var i = A.taches.indexOf(it);
+      if (i > -1) { A.taches.splice(i, 1); b.classList.remove("on"); }
+      else if (A.taches.length < 3) { A.taches.push(it); b.classList.add("on"); }
+      el("tacheNext").disabled = A.taches.length === 0;
+      el("tacheNext").textContent = A.taches.length
+        ? "Continuer (" + A.taches.length + "/3)" : "Continuer";
+      el("rythmeQ").innerHTML = A.taches.length === 1
+        ? "«&nbsp;" + A.taches[0].label + "&nbsp;»<br>Combien de fois, et combien de temps&nbsp;?"
+        : "Ces " + A.taches.length + " tâches, au total&nbsp;: combien de fois, et combien de temps&nbsp;?";
     }});
   }
 
@@ -1055,7 +1064,8 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     ];
     var score = conds.filter(function (c) { return c.ok; }).length;
 
-    var fam = (RECO_TACHE[A.tache.type] || RECO_TACHE.entrant).g;
+    var fams = A.taches.map(function (t) { return (RECO_TACHE[t.type] || RECO_TACHE.entrant).g; });
+    var fam = fams.indexOf("Agent") > -1 ? "Agent" : fams[0];
 
     var v;
     if (num.length === 0) {
@@ -1141,10 +1151,13 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
 
   function buildRecos(R) {
     var out = [], nSrc = R.num.length, v_key = R.v.key;
-    var sol = SOLUTION[A.tache.type] || SOLUTION.entrant;
-    var base = RECO_TACHE[A.tache.type] || RECO_TACHE.entrant;
-    out.push({ p:100, imp:3, ef:(base.g === "Agent" ? "moyen" : "rapide"), t:sol.t,
-      w:sol.d, g:base.g });
+    A.taches.forEach(function (t, k) {
+      var sol  = SOLUTION[t.type] || SOLUTION.entrant;
+      var base = RECO_TACHE[t.type] || RECO_TACHE.entrant;
+      out.push({ p:100 - k, imp:(k === 0 ? 3 : 2),
+        ef:(base.g === "Agent" ? "moyen" : "rapide"),
+        t:sol.t, w:sol.d, g:base.g });
+    });
 
     if (nSrc === 0) {
       out.push({ p:200, imp:3, ef:"moyen", pre:true, t:"Poser l'information quelque part de lisible",
@@ -1290,7 +1303,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     L.push("DIAGNOSTIC B&L CONNECT");
     L.push("");
     L.push("Activité : " + A.metier.label);
-    L.push("Tâche : " + A.tache.label);
+    L.push("Tâches : " + A.taches.map(function (t) { return t.label; }).join(" | "));
     L.push("Fréquence : " + A.freq.label + " fois par semaine, " + A.duree.label + " à chaque fois");
     L.push("Information : " + A.donnees.map(function (id) {
       return DONNEES.filter(function (d) { return d.id === id; })[0].label.toLowerCase();
@@ -1365,10 +1378,12 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
      REPRISE
      ======================================================================= */
   el("restart").addEventListener("click", function () {
-    A = { metier:null, tache:null, freq:null, duree:null, donnees:[],
+    A = { metier:null, taches:[], freq:null, duree:null, donnees:[],
           etapes:null, volume:null, equipes:null, taux:null, dept:null, suite:null };
     document.querySelectorAll(".opt.on, .chip.on").forEach(function (n) { n.classList.remove("on"); });
     var d = el("dock"); if (d) d.classList.remove("on");
+    el("tacheNext").disabled = true;
+    el("tacheNext").textContent = "Continuer";
     el("rythmeNext").disabled = true;
     el("donneesNext").disabled = true;
     el("contexteNext").disabled = true;
