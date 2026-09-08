@@ -4,57 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>html{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none !important}</style>
-  function render() {
-    R = compute();
-
-    countTo(el("costEur"), R.eurLo, 1250, "");
-    el("costScope").textContent = A.taches.length === 1
-      ? "sur cette tâche" : "sur ces " + A.taches.length + " tâches";
-    el("costCalc").textContent = "Jusqu\u2019à " + nf(R.eurHi) + " \u20ac, soit " +
-      nf(Math.round(R.hAn)) + " heures par an. Calcul fait sur vos réponses, à votre coût horaire.";
-
-    el("vTitle").innerHTML = R.v.title;
-    el("vText").textContent = R.v.text;
-
-    var ro = el("recoList");
-    ro.innerHTML = "";
-    buildRecos(R).forEach(function (r, i) {
-      var li = document.createElement("li");
-      li.className = "reco-item" + (i === 0 ? " first" : "");
-      var chaudTag = r.pre || r.g === "Cadrage" || r.g === "Formation" || r.g === "IA d\u2019entreprise" || r.g === "IA d'entreprise";
-      if (chaudTag) li.className += " amb";
-      li.innerHTML =
-        '<span class="reco-n" data-n="' + (i + 1) + '"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" ' +
-        'stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' +
-        I[FAM_ICO[r.g] || "doc"] + '</svg></span>' +
-        '<span><span class="reco-tag' + (chaudTag ? " pre" : "") + '">' + r.g + '</span>' +
-        '<span class="reco-t">' + r.t + '</span>' +
-        '<span class="meta">' +
-        (r.eur ? '<span class="gain">' + nf(r.eur) + " \u2192 " + nf(r.eurHi) + ' \u20ac / an</span>' : '') +
-        '<span class="effort ' + r.ef + '">' + EFFORT[r.ef] + '</span></span></span>';
-      ro.appendChild(li);
-    });
-
-    var notes = "";
-    if (A.dept.id === "oise") {
-      notes += '<div class="note fin"><h4>Financement, dans l\u2019Oise</h4>' +
-        "Diagnostic 600 \u20ac HT puis 70 % des dépenses pris en charge, plafond 3 000 \u20ac HT, " +
-        "pour les entreprises de l\u2019Oise de moins de 50 salariés et moins de 7 M\u20ac de chiffre d\u2019affaires." +
-        '<span class="small">Sous réserve d\u2019éligibilité et d\u2019acceptation.</span></div>';
-    } else {
-      notes += '<div class="note fin"><h4>Financement</h4>' +
-        "Des financements existent selon votre entreprise et la nature de l\u2019action." +
-        '<span class="small">Nous vérifions avant d\u2019annoncer.</span></div>';
-    }
-    el("extraNotes").innerHTML = notes;
-
-    el("ctaRdv").href = CONFIG.rdv;
-    el("ctaTop").href = CONFIG.rdv;
-    el("ctaDock").href = CONFIG.rdv;
-    setTimeout(function () { el("dock").classList.add("on"); }, 1600);
-    buildQR();
-  }
-
 <title>Diagnostic B&amp;L Connect</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">
 </head>
@@ -1422,70 +1371,49 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
   function render() {
     R = compute();
 
-    el("vEyebrow").textContent = R.v.eyebrow;
-    el("vTitle").innerHTML     = R.v.title;
-    el("vText").textContent    = R.v.text;
-
     countTo(el("costEur"), R.eurLo, 1250, "");
-    el("costH").textContent = nf(R.eurHi) + " €, soit " + nf(Math.round(R.hAn));
-    el("costCalc").textContent =
-      A.freq.label + " fois par semaine, " + A.duree.label + ", sur " +
-      CONFIG.semaines + " semaines. Votre calcul, pas le nôtre.";
+    el("costScope").textContent = A.taches.length === 1
+      ? "sur cette tâche" : "sur ces " + A.taches.length + " tâches";
+    el("costCalc").textContent = "Jusqu\u2019à " + nf(R.eurHi) + " \u20ac, soit " +
+      nf(Math.round(R.hAn)) + " heures par an. Calcul fait sur vos réponses, à votre coût horaire.";
 
-    el("gaugeNum").textContent = R.score;
-    var C = 2 * Math.PI * 44;
-    var arc = el("gaugeArc");
-    arc.setAttribute("stroke-dasharray", C.toFixed(1));
-    arc.setAttribute("stroke-dashoffset", C.toFixed(1));
-    setTimeout(function () { arc.setAttribute("stroke-dashoffset", (C - (R.score / 4) * C).toFixed(1)); }, 120);
-
-    var ul = el("condList");
-    ul.innerHTML = "";
-    R.conds.forEach(function (c) {
-      var li = document.createElement("li");
-      li.className = c.ok ? "yes" : "no";
-      li.innerHTML = '<span class="dot">' +
-        (c.ok ? '<svg width="9" height="9" viewBox="0 0 10 10" aria-hidden="true"><polyline points="1.5,5.2 3.9,7.6 8.5,2.4" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>' : '') +
-        '</span><span>' + c.txt + '</span>';
-      ul.appendChild(li);
-    });
+    el("vTitle").innerHTML = R.v.title;
+    el("vText").textContent = R.v.text;
 
     var ro = el("recoList");
     ro.innerHTML = "";
     buildRecos(R).forEach(function (r, i) {
       var li = document.createElement("li");
       li.className = "reco-item" + (i === 0 ? " first" : "");
-      var chaud = r.pre || r.g === "Cadrage" || r.g === "Formation" || r.g === "IA d'entreprise";
-      if (chaud) li.className += " amb";
-      var bars = '<i>' + [1,2,3].map(function (n) {
-        return '<b class="' + (n <= r.imp ? "on" : "") + '"></b>';
-      }).join("") + '</i>';
+      var chaudTag = r.pre || r.g === "Cadrage" || r.g === "Formation" || r.g === "IA d\u2019entreprise" || r.g === "IA d'entreprise";
+      if (chaudTag) li.className += " amb";
       li.innerHTML =
         '<span class="reco-n" data-n="' + (i + 1) + '"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" ' +
         'stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' +
         I[FAM_ICO[r.g] || "doc"] + '</svg></span>' +
-        '<span><span class="reco-tag' + (chaud ? " pre" : "") + '">' + r.g + '</span>' +
+        '<span><span class="reco-tag' + (chaudTag ? " pre" : "") + '">' + r.g + '</span>' +
         '<span class="reco-t">' + r.t + '</span>' +
-        '<span class="reco-w">' + r.w + '</span>' +
-        '<span class="meta"><span class="bars">Impact ' + bars + '</span>' +
+        '<span class="meta">' +
+        (r.eur ? '<span class="gain">' + nf(r.eur) + " \u2192 " + nf(r.eurHi) + ' \u20ac / an</span>' : '') +
         '<span class="effort ' + r.ef + '">' + EFFORT[r.ef] + '</span></span></span>';
       ro.appendChild(li);
     });
 
     var notes = "";
     if (A.dept.id === "oise") {
-      notes += '<div class="note fin"><h4>Financement, dans l’Oise</h4>' +
-        'Diagnostic 600 € HT, puis 70 % des dépenses pris en charge, plafond 3 000 € HT. Entreprises de l’Oise, moins de 50 salariés et moins de 7 M€ de chiffre d’affaires. ' +
-        '<span class="small">Sous réserve d’éligibilité et d’acceptation. Nous vérifions avant d’annoncer.</span></div>';
+      notes += '<div class="note fin"><h4>Financement, dans l\u2019Oise</h4>' +
+        "Diagnostic 600 \u20ac HT puis 70 % des dépenses pris en charge, plafond 3 000 \u20ac HT, " +
+        "pour les entreprises de l\u2019Oise de moins de 50 salariés et moins de 7 M\u20ac de chiffre d\u2019affaires." +
+        '<span class="small">Sous réserve d\u2019éligibilité et d\u2019acceptation.</span></div>';
     } else {
       notes += '<div class="note fin"><h4>Financement</h4>' +
-        'Des financements existent selon votre entreprise et la nature de l’action, en particulier en formation. ' +
-        '<span class="small">Nous vérifions avant d’annoncer.</span></div>';
+        "Des financements existent selon votre entreprise et la nature de l\u2019action." +
+        '<span class="small">Nous vérifions avant d\u2019annoncer.</span></div>';
     }
     el("extraNotes").innerHTML = notes;
 
     el("ctaRdv").href = CONFIG.rdv;
-    el("ctaTop").href  = CONFIG.rdv;
+    el("ctaTop").href = CONFIG.rdv;
     el("ctaDock").href = CONFIG.rdv;
     setTimeout(function () { el("dock").classList.add("on"); }, 1600);
     buildQR();
