@@ -544,14 +544,6 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
           </div>
         </div>
 
-        <div class="panel fam">
-          <div class="fam-head">
-            <h3>Les quatre façons de faire travailler l’IA</h3>
-            <p>Pour situer ce qui vous concerne dans l’ensemble.</p>
-          </div>
-          <ul class="fam-list" id="famList"></ul>
-        </div>
-
         <div class="card reco">
           <div class="reco-head">
             <h3>Vos pistes, classées</h3>
@@ -1063,55 +1055,39 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     ];
     var score = conds.filter(function (c) { return c.ok; }).length;
 
+    var fam = (RECO_TACHE[A.tache.type] || RECO_TACHE.entrant).g;
+
     var v;
     if (num.length === 0) {
-      v = {
-        key:"amont",
-        eyebrow:"Ce qui est faisable chez vous",
+      v = { key:"amont", eyebrow:"Ce qui est faisable chez vous",
         title:"D’abord rendre cette information <span class=\"hl\">lisible</span>",
-        text:"Un système ne lit que ce qui existe quelque part. Aujourd’hui, ce n’est ni sur un drive, ni dans un logiciel. C’est le point de départ, et il est plus court qu’on ne croit.",
-        tag:"Première étape avant tout outil"
-      };
+        text:"Un système ne lit que ce qui existe quelque part. Ni sur un drive, ni dans un logiciel aujourd’hui.",
+        tag:"Première étape avant tout outil" };
     } else if (num.length >= 3 || (A.volume.v >= 50 && num.length >= 2)) {
-      v = {
-        key:"plateforme",
-        eyebrow:"Ce qui est faisable chez vous",
+      v = { key:"plateforme", eyebrow:"Ce qui est faisable chez vous",
         title:"Votre sujet, c’est <span class=\"hl\">l’éparpillement</span>",
         text:"Votre information vit à " + num.length + " endroits. Chaque tâche repaie le même coût de recherche.",
-        tag:"Plateformes IA métier"
-      };
-    } else if (A.etapes.id === "toujours" && A.freq.v >= 6) {
-      v = {
-        key:"agent",
-        eyebrow:"Ce qui est faisable chez vous",
+        tag:"Plateforme IA métier" };
+    } else if (fam === "Agent" && A.etapes.id === "toujours" && A.freq.v >= 6) {
+      v = { key:"agent", eyebrow:"Ce qui est faisable chez vous",
         title:"Cette tâche peut tourner <span class=\"hl\">sans que vous la demandiez</span>",
-        text:"Assez fréquente, toujours le même chemin, données déjà en place. Le profil type.",
-        tag:"Agents IA sur mesure"
-      };
-    } else if (A.etapes.id === "souvent" && A.freq.v >= 6) {
-      v = {
-        key:"agent-cadre",
-        eyebrow:"Ce qui est faisable chez vous",
+        text:"Assez fréquente, toujours le même chemin, données déjà en place.",
+        tag:"Agent IA sur mesure" };
+    } else if (fam === "Agent" && A.freq.v >= 6 && A.etapes.id !== "rarement") {
+      v = { key:"agent-cadre", eyebrow:"Ce qui est faisable chez vous",
         title:"Assez fréquente pour tourner seule, <span class=\"hl\">une fois le chemin fixé</span>",
-        text:"Il reste des variantes. Les écrire est notre premier travail avec vous, pas un obstacle.",
-        tag:"Cadrage puis agent"
-      };
+        text:"Il reste des variantes. Les écrire est notre premier travail avec vous.",
+        tag:"Cadrage puis agent" };
     } else if (A.etapes.id !== "rarement") {
-      v = {
-        key:"assistant",
-        eyebrow:"Ce qui est faisable chez vous",
+      v = { key:"assistant", eyebrow:"Ce qui est faisable chez vous",
         title:"Cette tâche peut être <span class=\"hl\">préparée à votre place</span>",
-        text:"Pas assez fréquente pour tourner seule. La préparation, elle, se délègue dès maintenant.",
-        tag:"Assistants IA"
-      };
+        text:"La préparation se délègue dès maintenant, la décision reste la vôtre.",
+        tag:"Assistant IA" };
     } else {
-      v = {
-        key:"cadre",
-        eyebrow:"Ce qui est faisable chez vous",
+      v = { key:"cadre", eyebrow:"Ce qui est faisable chez vous",
         title:"On commence par <span class=\"hl\">isoler ce qui revient</span>",
-        text:"Vous dites que chaque cas diffère. Une part l'est vraiment, une part non. On sépare les deux, puis on automatise la seconde.",
-        tag:"Cadrage et formation"
-      };
+        text:"Une part de vos cas se ressemble vraiment. On sépare, puis on automatise celle-là.",
+        tag:"Cadrage et formation" };
     }
 
     return {
@@ -1160,24 +1136,6 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     "Agent":"relance", "Assistant":"doc", "Plateforme":"drive",
     "Formation":"tetes", "IA d'entreprise":"logiciel", "Cadrage":"fixe", "Préalable":"papier"
   };
-
-  var FAMILLES = [
-    { k:"assistant", ic:"doc", t:"Un assistant",
-      w:"Vous lui demandez, il prépare. Sur une tâche précise, avec vos documents." },
-    { k:"agent", ic:"relance", t:"Un agent",
-      w:"Il surveille un flux, agit seul sur le routinier, et s’arrête devant ce qui engage." },
-    { k:"plateforme", ic:"drive", t:"Une plateforme métier",
-      w:"Un endroit unique où tout arrive, se classe et se retrouve, construit autour de votre façon de travailler." },
-    { k:"entreprise", ic:"tetes", t:"L’IA d’entreprise",
-      w:"L’IA du quotidien pour toute l’équipe, dans vos outils actuels, avec des règles écrites." }
-  ];
-
-  function famMine(key) {
-    if (key === "plateforme") return "plateforme";
-    if (key === "agent" || key === "agent-cadre") return "agent";
-    if (key === "assistant") return "assistant";
-    return "entreprise";
-  }
 
   var EFFORT = { rapide:"Rapide", moyen:"Quelques semaines", long:"Structurant" };
 
@@ -1263,20 +1221,6 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
         (c.ok ? '<svg width="9" height="9" viewBox="0 0 10 10" aria-hidden="true"><polyline points="1.5,5.2 3.9,7.6 8.5,2.4" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>' : '') +
         '</span><span>' + c.txt + '</span>';
       ul.appendChild(li);
-    });
-
-    var fl = el("famList");
-    fl.innerHTML = "";
-    var mine = famMine(R.v.key);
-    FAMILLES.forEach(function (f) {
-      var li = document.createElement("li");
-      li.className = "fam-row" + (f.k === mine ? " mine" : "");
-      li.innerHTML = '<span class="fam-ico"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" ' +
-        'stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' + I[f.ic] + '</svg></span>' +
-        '<span><span class="fam-t">' + f.t +
-        (f.k === mine ? '<span class="fam-you">votre cas</span>' : '') + '</span>' +
-        '<span class="fam-w">' + f.w + '</span></span>';
-      fl.appendChild(li);
     });
 
     var ro = el("recoList");
