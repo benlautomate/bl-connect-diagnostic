@@ -500,10 +500,10 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
 
       <section class="screen" id="s-tache" hidden>
         <div class="head"><span class="eyebrow">Question 2</span>
-          <h2 class="q">Lesquelles vous prennent du temps <span class="hl">sans demander votre expertise</span>&nbsp;?</h2>
+          <h2 class="q">Lesquelles vous prennent <span class="hl">le plus de temps</span>&nbsp;?</h2>
         </div>
-        <p class="hint">Jusqu’à trois. Nécessaires, mais elles n’ont pas besoin de vous.</p>
-        <p class="legend"><span class="d cy"></span>préparé à votre demande <span class="d am"></span>traité en continu</p>
+        <p class="hint">Jusqu’à trois. Celles qui reviennent sans cesse, ou celles qui sont longues à démêler.</p>
+        <p class="legend"><span class="d cy"></span>préparé à votre demande <span class="d am"></span>traité en continu, sans vous</p>
         <div class="opts" id="optsTache"></div>
         <div class="actions">
           <button class="cta" id="tacheNext" disabled data-go="rythme">Continuer</button>
@@ -705,34 +705,37 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       { t:"relance",   label:"Relancer sur les échéances et les retards" },
       { t:"entrant",   label:"Répondre aux questions courantes des clients" },
       { t:"reporting", label:"Produire les situations et tableaux de bord" },
-      { t:"recherche", label:"Retrouver une pièce dans un dossier" },
       { t:"facture",   label:"Facturer et suivre les impayés" },
       { t:"contenu",     label:"Alimenter votre communication" },
-      { t:"acquisition", label:"Aller chercher de nouveaux clients" }
+      { t:"acquisition", label:"Aller chercher de nouveaux clients" },
+      { t:"analyse",     label:"Éplucher de gros documents pour en sortir l’essentiel" },
+      { t:"synthese",    label:"Recouper de la matière éparpillée sur un sujet" }
     ],
     juridique: [
       { t:"pieces",    label:"Réclamer les pièces d’un dossier" },
       { t:"doc",       label:"Rédiger des actes ou des courriers récurrents" },
-      { t:"recherche", label:"Retrouver un précédent dans les dossiers passés" },
       { t:"controle",  label:"Relire et vérifier avant signature" },
       { t:"entrant",   label:"Répondre aux demandes d’information" },
       { t:"relance",   label:"Relancer sur les échéances et les délais" },
       { t:"veille",    label:"Suivre les évolutions réglementaires" },
       { t:"facture",   label:"Facturer le temps passé et relancer" },
       { t:"contenu",     label:"Alimenter votre communication" },
-      { t:"acquisition", label:"Aller chercher de nouveaux clients" }
+      { t:"acquisition", label:"Aller chercher de nouveaux clients" },
+      { t:"analyse",     label:"Éplucher de gros documents pour en sortir l’essentiel" },
+      { t:"synthese",    label:"Recouper de la matière éparpillée sur un sujet" }
     ],
     etudes: [
       { t:"pieces",    label:"Constituer et vérifier les dossiers techniques" },
       { t:"doc",       label:"Chiffrer des devis qui se ressemblent" },
-      { t:"recherche", label:"Retrouver un plan, une note, un ancien dossier" },
       { t:"doc2",      label:"Produire les comptes rendus de réunion" },
       { t:"controle",  label:"Vérifier la conformité d’un livrable" },
       { t:"relance",   label:"Relancer les devis sans réponse" },
       { t:"saisie",    label:"Reporter des données d’un document à un outil" },
       { t:"entrant",   label:"Traiter les demandes et les appels d’offres" },
       { t:"contenu",     label:"Alimenter votre communication" },
-      { t:"acquisition", label:"Aller chercher de nouveaux clients" }
+      { t:"acquisition", label:"Aller chercher de nouveaux clients" },
+      { t:"analyse",     label:"Éplucher de gros documents pour en sortir l’essentiel" },
+      { t:"synthese",    label:"Recouper de la matière éparpillée sur un sujet" }
     ],
     courtage: [
       { t:"pieces",    label:"Réclamer les pièces d’un dossier de souscription" },
@@ -740,11 +743,12 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       { t:"controle",  label:"Vérifier la complétude avant transmission" },
       { t:"relance",   label:"Relancer sur les renouvellements" },
       { t:"entrant",   label:"Répondre aux questions sur les garanties" },
-      { t:"recherche", label:"Retrouver une condition dans un contrat" },
       { t:"veille",    label:"Suivre les évolutions de produits et de tarifs" },
       { t:"facture",   label:"Suivre les commissions et les impayés" },
       { t:"contenu",     label:"Alimenter votre communication" },
-      { t:"acquisition", label:"Aller chercher de nouveaux clients" }
+      { t:"acquisition", label:"Aller chercher de nouveaux clients" },
+      { t:"analyse",     label:"Éplucher de gros documents pour en sortir l’essentiel" },
+      { t:"synthese",    label:"Recouper de la matière éparpillée sur un sujet" }
     ],
     formation: [
       { t:"pieces",    label:"Monter les dossiers de financement" },
@@ -752,11 +756,12 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       { t:"doc",       label:"Produire convocations et attestations" },
       { t:"controle",  label:"Vérifier la conformité des dossiers" },
       { t:"entrant",   label:"Répondre aux demandes d’information" },
-      { t:"recherche", label:"Retrouver un support ou un document de session" },
       { t:"planif",    label:"Organiser les sessions et les intervenants" },
       { t:"facture",   label:"Facturer et suivre les règlements" },
       { t:"contenu",     label:"Alimenter votre communication" },
-      { t:"acquisition", label:"Aller chercher de nouveaux clients" }
+      { t:"acquisition", label:"Aller chercher de nouveaux clients" },
+      { t:"analyse",     label:"Éplucher de gros documents pour en sortir l’essentiel" },
+      { t:"synthese",    label:"Recouper de la matière éparpillée sur un sujet" }
     ],
     technique: [
       { t:"planif",    label:"Planifier les interventions" },
@@ -764,39 +769,54 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       { t:"relance",   label:"Relancer les devis sans réponse" },
       { t:"entrant",   label:"Traiter les demandes entrantes" },
       { t:"pieces",    label:"Réclamer les éléments manquants avant intervention" },
-      { t:"recherche", label:"Retrouver l’historique d’un client ou d’un site" },
       { t:"saisie",    label:"Ressaisir les rapports terrain dans l’outil" },
       { t:"facture",   label:"Facturer les interventions et relancer" },
       { t:"contenu",     label:"Alimenter votre communication" },
-      { t:"acquisition", label:"Aller chercher de nouveaux clients" }
+      { t:"acquisition", label:"Aller chercher de nouveaux clients" },
+      { t:"analyse",     label:"Éplucher de gros documents pour en sortir l’essentiel" },
+      { t:"synthese",    label:"Recouper de la matière éparpillée sur un sujet" }
     ],
     batiment: [
       { t:"doc",       label:"Chiffrer les devis" },
       { t:"relance",   label:"Relancer les devis sans réponse" },
       { t:"doc2",      label:"Produire les comptes rendus de chantier" },
       { t:"pieces",    label:"Réclamer les pièces aux clients ou sous-traitants" },
-      { t:"entrant",   label:"Répondre aux demandes et aux appels entrants" },
       { t:"planif",    label:"Organiser les plannings de chantier" },
       { t:"saisie",    label:"Ressaisir les heures et les fournitures" },
       { t:"facture",   label:"Facturer les situations et relancer les impayés" },
       { t:"contenu",     label:"Alimenter votre communication" },
-      { t:"acquisition", label:"Aller chercher de nouveaux clients" }
+      { t:"acquisition", label:"Aller chercher de nouveaux clients" },
+      { t:"analyse",     label:"Éplucher de gros documents pour en sortir l’essentiel" },
+      { t:"synthese",    label:"Recouper de la matière éparpillée sur un sujet" }
     ],
     autre: [
       { t:"entrant",   label:"Traiter les demandes entrantes" },
       { t:"relance",   label:"Relancer les devis ou les propositions" },
       { t:"pieces",    label:"Réclamer des pièces ou des informations" },
       { t:"doc",       label:"Produire des documents récurrents" },
-      { t:"recherche", label:"Retrouver une information dans vos documents" },
       { t:"saisie",    label:"Reporter des données d’un support à un autre" },
       { t:"facture",   label:"Facturer et suivre les règlements" },
       { t:"interne",   label:"Répondre aux mêmes questions de l’équipe" },
       { t:"contenu",     label:"Alimenter votre communication" },
-      { t:"acquisition", label:"Aller chercher de nouveaux clients" }
+      { t:"acquisition", label:"Aller chercher de nouveaux clients" },
+      { t:"analyse",     label:"Éplucher de gros documents pour en sortir l’essentiel" },
+      { t:"synthese",    label:"Recouper de la matière éparpillée sur un sujet" }
     ]
   };
 
   var SCENES = {
+    analyse: {
+      surveille:"les documents volumineux qui arrivent",
+      detecte:"les points qui vous concernent, et ceux qui posent problème",
+      agit:"ressort l’essentiel, chiffré et localisé dans le document",
+      arrete:"à la restitution. L’arbitrage vous revient entier"
+    },
+    synthese: {
+      surveille:"la matière accumulée sur un sujet",
+      detecte:"ce qui revient, ce qui se contredit, ce qui manque",
+      agit:"produit la synthèse, avec les sources en regard",
+      arrete:"à la synthèse. Vous décidez de ce qu’on en fait"
+    },
     contenu: {
       surveille:"vos dossiers marquants et votre calendrier",
       detecte:"un sujet qui mérite d’être raconté",
@@ -1036,6 +1056,8 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     facture:'<path d="M5 2.6h10v14.8l-2.5-1.6-2.5 1.6-2.5-1.6L5 17.4z"/><path d="M8 7.4h4M8 10.6h4"/>',
     fixe:'<path d="M3.4 10h13.2"/><circle cx="6.6" cy="10" r="1.6"/><circle cx="13.4" cy="10" r="1.6"/>',
     variante:'<path d="M3.4 6.6h13.2M3.4 13.4h13.2"/><circle cx="7.4" cy="6.6" r="1.5"/><circle cx="12.6" cy="13.4" r="1.5"/>',
+    analyse:'<path d="M5 2.6h6l4 4v10.8H5z"/><path d="M11 2.6v4h4"/><circle cx="9.4" cy="11.4" r="2.4"/><path d="m11.4 13.4 1.8 1.8"/>',
+    synthese:'<path d="M3.4 5h13.2M3.4 9h13.2M3.4 13h8M3.4 17h5"/><circle cx="14.6" cy="15" r="2.4"/><path d="m16.4 16.8 1.4 1.4"/>',
     contenu:'<path d="M13.4 3.4 16.6 6.6 7.4 15.8l-4 .8.8-4z"/><path d="M11.8 5 15 8.2"/>',
     acquisition:'<circle cx="10" cy="10" r="7"/><circle cx="10" cy="10" r="3.4"/><circle cx="10" cy="10" r=".9" fill="currentColor"/>',
     controle:'<circle cx="10" cy="10" r="7.2"/><path d="m6.8 10.2 2.2 2.2 4.2-4.6"/>',
@@ -1285,6 +1307,10 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
 
   /* ---------------- preconisations ---------------- */
   var SOLUTION = {
+    analyse:{ t:"Un assistant d’analyse documentaire",
+             d:"Vous lui donnez le dossier, même volumineux. Il en ressort les points qui vous concernent, avec la page et le passage exacts, et signale ce qui cloche." },
+    synthese:{ t:"Un assistant de synthèse",
+             d:"Il lit toute la matière d’un sujet, en tire ce qui revient et ce qui se contredit, et vous rend une note courte avec ses sources en regard." },
     contenu:{ t:"Un assistant de contenu dans votre voix",
              d:"Il part de vos dossiers, de vos notes et de votre façon d’écrire pour produire vos publications, prêtes à relire." },
     acquisition:{ t:"Un agent de prise de contact et de suivi",
@@ -1318,6 +1344,10 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
   };
 
   var RECO_TACHE = {
+    analyse:{ t:"L’essentiel ressorti des gros dossiers",
+              w:"{H} heures par an à lire beaucoup pour en retenir peu.", g:"Assistant" },
+    synthese:{t:"La synthèse préparée, sources à l’appui",
+              w:"{H} heures par an à recouper de la matière éparpillée.", g:"Assistant" },
     contenu:{ t:"Vos publications préparées dans votre ton",
               w:"{H} heures par an, et une communication qui s’arrête dès que la charge monte.", g:"Assistant" },
     acquisition:{ t:"La prise de contact préparée et suivie",
