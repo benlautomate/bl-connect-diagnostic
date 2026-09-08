@@ -538,7 +538,6 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
           <span class="eyebrow" id="vEyebrow"></span>
           <h2 id="vTitle" style="margin-top:.75rem"></h2>
           <p class="vtext" id="vText"></p>
-          <span class="badge" id="vBadge"></span>
           <a class="cta light" id="ctaTop" href="#" target="_blank" rel="noopener">Réserver un échange découverte</a>
           <div class="proof">
             <span><span class="stars">★★★★★</span> 5,0 sur Google, 7 avis</span>
@@ -580,25 +579,15 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
         <div class="panel close">
           <span class="eyebrow">La suite</span>
           <h2>On regarde ça ensemble, <span class="hl">30 minutes</span></h2>
-          <p class="hint">Vous repartez avec un premier périmètre chiffré. Et si l’IA n’est pas la bonne réponse pour ce que vous venez de décrire, nous vous le disons.</p>
-          <div class="recap">
-            <div class="tile"><span class="tile-n" id="tH"></span><span class="tile-l">heures par an</span></div>
-            <div class="tile"><span class="tile-n" id="tE"></span><span class="tile-l">euros par an</span></div>
-            <div class="tile wide"><span class="tile-n" id="tV"></span><span class="tile-l">la piste pour vous</span></div>
-          </div>
+          <p class="hint">Vous repartez avec un premier périmètre chiffré.</p>
           <a class="cta light" id="ctaRdv" href="#" target="_blank" rel="noopener">Réserver mon échange découverte</a>
-          <div class="proof mini">
-            <span><span class="stars">★★★★★</span> 5,0 sur Google, 7 avis</span>
-            <span>Gratuit, sans engagement</span>
-          </div>
           <div class="sep"></div>
-          <p class="hint tight">Pas le temps maintenant ? Recevez ce diagnostic, vous déciderez après.</p>
           <div class="two">
             <div class="field"><label for="fPrenom">Prénom</label><input id="fPrenom" type="text" autocomplete="given-name"></div>
             <div class="field"><label for="fMail">Email</label><input id="fMail" type="email" autocomplete="email" placeholder="vous@cabinet.fr"></div>
           </div>
-          <button class="cta ghost" id="sendBtn">Recevoir mon diagnostic</button>
-          <p class="hint tight" id="sendHint">Votre messagerie s’ouvre pré-remplie. Vous relisez, vous envoyez.</p>
+          <button class="cta ghost" id="sendBtn">Recevoir ce diagnostic</button>
+          <p class="hint tight" id="sendHint">Votre messagerie s’ouvre pré-remplie.</p>
           <div class="qr-box" id="qrBox">
             <div id="qrHolder"></div>
             <p class="hint tight">À scanner avec votre téléphone.</p>
@@ -655,43 +644,58 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
   var TACHES = {
     compta: [
       { t:"pieces",    label:"Réclamer les pièces manquantes aux clients" },
+      { t:"saisie",    label:"Ressaisir les factures et les relevés" },
+      { t:"controle",  label:"Contrôler un dossier avant de le rendre" },
       { t:"relance",   label:"Relancer sur les échéances et les retards" },
       { t:"entrant",   label:"Répondre aux questions courantes des clients" },
-      { t:"doc",       label:"Produire les documents récurrents" },
+      { t:"reporting", label:"Produire les situations et tableaux de bord" },
       { t:"recherche", label:"Retrouver une pièce dans un dossier" },
-      { t:"planif",    label:"Classer et rapprocher les documents reçus" }
+      { t:"facture",   label:"Facturer et suivre les impayés" },
+      { t:"interne",   label:"Répondre aux mêmes questions de l’équipe" }
     ],
     juridique: [
       { t:"pieces",    label:"Réclamer les pièces d’un dossier" },
       { t:"doc",       label:"Rédiger des actes ou des courriers récurrents" },
       { t:"recherche", label:"Retrouver un précédent dans les dossiers passés" },
+      { t:"controle",  label:"Relire et vérifier avant signature" },
       { t:"entrant",   label:"Répondre aux demandes d’information" },
       { t:"relance",   label:"Relancer sur les échéances et les délais" },
-      { t:"planif",    label:"Suivre l’avancement des dossiers en cours" }
+      { t:"veille",    label:"Suivre les évolutions réglementaires" },
+      { t:"facture",   label:"Facturer le temps passé et relancer" },
+      { t:"interne",   label:"Répondre aux mêmes questions de l’équipe" }
     ],
     etudes: [
       { t:"pieces",    label:"Constituer et vérifier les dossiers techniques" },
       { t:"doc",       label:"Chiffrer des devis qui se ressemblent" },
       { t:"recherche", label:"Retrouver un plan, une note, un ancien dossier" },
       { t:"doc2",      label:"Produire les comptes rendus de réunion" },
+      { t:"controle",  label:"Vérifier la conformité d’un livrable" },
       { t:"relance",   label:"Relancer les devis sans réponse" },
-      { t:"entrant",   label:"Traiter les demandes et les appels d’offres" }
+      { t:"saisie",    label:"Reporter des données d’un document à un outil" },
+      { t:"entrant",   label:"Traiter les demandes et les appels d’offres" },
+      { t:"reporting", label:"Produire les états d’avancement" }
     ],
     courtage: [
       { t:"pieces",    label:"Réclamer les pièces d’un dossier de souscription" },
       { t:"doc",       label:"Comparer et présenter des offres" },
+      { t:"controle",  label:"Vérifier la complétude avant transmission" },
       { t:"relance",   label:"Relancer sur les renouvellements" },
       { t:"entrant",   label:"Répondre aux questions sur les garanties" },
       { t:"recherche", label:"Retrouver une condition dans un contrat" },
-      { t:"planif",    label:"Suivre l’avancement des dossiers en cours" }
+      { t:"saisie",    label:"Ressaisir les données dans les extranets" },
+      { t:"veille",    label:"Suivre les évolutions de produits et de tarifs" },
+      { t:"facture",   label:"Suivre les commissions et les impayés" }
     ],
     formation: [
       { t:"pieces",    label:"Monter les dossiers de financement" },
       { t:"relance",   label:"Relancer sur les pièces et les inscriptions" },
       { t:"doc",       label:"Produire convocations et attestations" },
+      { t:"controle",  label:"Vérifier la conformité des dossiers" },
       { t:"entrant",   label:"Répondre aux demandes d’information" },
       { t:"recherche", label:"Retrouver un support ou un document de session" },
-      { t:"planif",    label:"Organiser les sessions et les intervenants" }
+      { t:"planif",    label:"Organiser les sessions et les intervenants" },
+      { t:"facture",   label:"Facturer et suivre les règlements" },
+      { t:"reporting", label:"Produire les bilans et les indicateurs" }
     ],
     technique: [
       { t:"planif",    label:"Planifier les interventions" },
@@ -699,15 +703,21 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       { t:"relance",   label:"Relancer les devis sans réponse" },
       { t:"entrant",   label:"Traiter les demandes entrantes" },
       { t:"pieces",    label:"Réclamer les éléments manquants avant intervention" },
-      { t:"recherche", label:"Retrouver l’historique d’un client ou d’un site" }
+      { t:"recherche", label:"Retrouver l’historique d’un client ou d’un site" },
+      { t:"saisie",    label:"Ressaisir les rapports terrain dans l’outil" },
+      { t:"facture",   label:"Facturer les interventions et relancer" },
+      { t:"reporting", label:"Produire le suivi des contrats de maintenance" }
     ],
     batiment: [
       { t:"doc",       label:"Chiffrer les devis" },
       { t:"relance",   label:"Relancer les devis sans réponse" },
       { t:"doc2",      label:"Produire les comptes rendus de chantier" },
-      { t:"pieces",    label:"Réclamer les pièces aux clients ou aux sous-traitants" },
+      { t:"pieces",    label:"Réclamer les pièces aux clients ou sous-traitants" },
       { t:"entrant",   label:"Répondre aux demandes et aux appels entrants" },
-      { t:"planif",    label:"Organiser les plannings de chantier" }
+      { t:"planif",    label:"Organiser les plannings de chantier" },
+      { t:"saisie",    label:"Ressaisir les heures et les fournitures" },
+      { t:"facture",   label:"Facturer les situations et relancer les impayés" },
+      { t:"controle",  label:"Vérifier un dossier avant de le rendre" }
     ],
     autre: [
       { t:"entrant",   label:"Traiter les demandes entrantes" },
@@ -715,11 +725,50 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       { t:"pieces",    label:"Réclamer des pièces ou des informations" },
       { t:"doc",       label:"Produire des documents récurrents" },
       { t:"recherche", label:"Retrouver une information dans vos documents" },
-      { t:"planif",    label:"Organiser le planning et le suivi" }
+      { t:"saisie",    label:"Reporter des données d’un support à un autre" },
+      { t:"controle",  label:"Vérifier et relire avant envoi" },
+      { t:"facture",   label:"Facturer et suivre les règlements" },
+      { t:"interne",   label:"Répondre aux mêmes questions de l’équipe" }
     ]
   };
 
   var SCENES = {
+    saisie: {
+      surveille:"les documents qui arrivent et attendent d’être saisis",
+      detecte:"les informations à reporter et leur destination",
+      agit:"extrait, vérifie la cohérence et prépare la saisie",
+      arrete:"avant validation dans votre outil"
+    },
+    controle: {
+      surveille:"les dossiers arrivés au stade du contrôle",
+      detecte:"écarts, oublis et incohérences",
+      agit:"signale ce qui cloche, avec la pièce concernée",
+      arrete:"au signalement. Le jugement reste le vôtre"
+    },
+    facture: {
+      surveille:"ce qui est facturable et ce qui est échu",
+      detecte:"une facture à émettre, un règlement en retard",
+      agit:"prépare la facture ou la relance, montants à jour",
+      arrete:"avant l’envoi au client"
+    },
+    reporting: {
+      surveille:"vos données au fil de leur mise à jour",
+      detecte:"l’échéance de production de l’état",
+      agit:"produit le tableau et rédige les commentaires",
+      arrete:"avant diffusion. Vous validez les conclusions"
+    },
+    interne: {
+      surveille:"vos procédures et vos documents de référence",
+      detecte:"à quel document la question renvoie",
+      agit:"répond à la personne et cite sa source",
+      arrete:"sur les cas non couverts, qui vous reviennent"
+    },
+    veille: {
+      surveille:"les sources qui comptent pour votre métier",
+      detecte:"ce qui change et vous concerne vraiment",
+      agit:"résume et dit ce qui est impacté chez vous",
+      arrete:"à la synthèse. L’interprétation reste la vôtre"
+    },
     relance: {
       surveille:"vos propositions envoy\u00e9es et leurs dates",
       detecte:"celles sans r\u00e9ponse au d\u00e9lai que vous fixez",
@@ -901,8 +950,14 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     doc2:'<path d="M4 4.6h12M4 8.2h12M4 11.8h8M4 15.4h8"/>',
     recherche:'<circle cx="8.8" cy="8.8" r="5.2"/><path d="m12.8 12.8 4 4"/>',
     entrant:'<path d="M2.6 11.4h4l1.2 2h4.4l1.2-2h4"/><path d="M4.6 4.6h10.8l2 6.8v4.2a1.4 1.4 0 0 1-1.4 1.4H4a1.4 1.4 0 0 1-1.4-1.4v-4.2z"/>',
+    saisie:'<path d="M10 2.8v8.6M6.8 8.4 10 11.6l3.2-3.2"/><path d="M3.4 13.2v2.4a1.6 1.6 0 0 0 1.6 1.6h10a1.6 1.6 0 0 0 1.6-1.6v-2.4"/>',
+    facture:'<path d="M5 2.6h10v14.8l-2.5-1.6-2.5 1.6-2.5-1.6L5 17.4z"/><path d="M8 7.4h4M8 10.6h4"/>',
     fixe:'<path d="M3.4 10h13.2"/><circle cx="6.6" cy="10" r="1.6"/><circle cx="13.4" cy="10" r="1.6"/>',
     variante:'<path d="M3.4 6.6h13.2M3.4 13.4h13.2"/><circle cx="7.4" cy="6.6" r="1.5"/><circle cx="12.6" cy="13.4" r="1.5"/>',
+    controle:'<circle cx="10" cy="10" r="7.2"/><path d="m6.8 10.2 2.2 2.2 4.2-4.6"/>',
+    reporting:'<path d="M3.6 16.4V9.2M8.6 16.4V4.4M13.6 16.4v-5M3 16.4h14"/>',
+    interne:'<circle cx="7.4" cy="7.2" r="2.6"/><circle cx="13.6" cy="9" r="2"/><path d="M2.8 16.4a4.6 4.6 0 0 1 9.2 0M13 16.4a3.4 3.4 0 0 1 4.2-3.3"/>',
+    veille:'<circle cx="9.2" cy="9.2" r="5.4"/><path d="m13.2 13.2 3.6 3.6M9.2 6.8v2.4l1.6 1"/>',
     unique:'<path d="M4.4 15.6 15.6 4.4M4.4 4.4l11.2 11.2"/>',
     ok:'<circle cx="10" cy="10" r="7.2"/><path d="m6.8 10.2 2.2 2.2 4.2-4.6"/>',
     alerte:'<path d="M10 3.4 17.4 16H2.6z"/><path d="M10 8.4v3.2M10 14h.01"/>',
@@ -1109,6 +1164,18 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
 
   /* ---------------- preconisations ---------------- */
   var SOLUTION = {
+    saisie:{ t:"Un agent de saisie depuis vos documents",
+             d:"Il lit les documents reçus, en extrait les informations utiles et prépare la saisie dans votre outil, prête à valider." },
+    controle:{ t:"Un assistant de contrôle",
+             d:"Il relit les dossiers avant vous et signale écarts, pièces absentes et incohérences, avec le passage concerné." },
+    facture:{ t:"Un agent de facturation et de relance",
+             d:"Il prépare les factures à émettre et les relances d’impayés, avec les bons montants et les bonnes échéances." },
+    reporting:{ t:"Un assistant de reporting",
+             d:"Il produit vos états récurrents à votre format et rédige les commentaires à partir des chiffres." },
+    interne:{ t:"Une base de connaissance interne",
+             d:"Vos équipes posent leur question en français, la réponse arrive avec la procédure ou le document d’où elle vient." },
+    veille:{ t:"Un agent de veille ciblée",
+             d:"Il suit les sources de votre métier et ne vous signale que ce qui vous concerne, en disant ce que ça change." },
     relance:{ t:"Un agent de relance branché sur votre messagerie",
               d:"Il connaît vos propositions en cours et leurs dates. Vous fixez le délai, il écrit la relance dans vos mots et vous la soumet." },
     pieces:{  t:"Un agent de collecte de pièces",
@@ -1126,6 +1193,18 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
   };
 
   var RECO_TACHE = {
+    saisie:{  t:"La saisie préparée depuis vos documents",
+              w:"{F} fois par semaine de recopie sans valeur ajoutée.", g:"Agent" },
+    controle:{t:"Une relecture avant la vôtre",
+              w:"{H} heures par an de vérification. Les écarts remontent avant vous.", g:"Assistant" },
+    facture:{ t:"Facturation et impayés suivis",
+              w:"{F} fois par semaine. Un impayé oublié coûte plus qu’une relance.", g:"Agent" },
+    reporting:{t:"Vos états produits automatiquement",
+              w:"{H} heures par an à compiler des chiffres qui existent déjà.", g:"Assistant" },
+    interne:{ t:"Les questions de l’équipe traitées sans vous",
+              w:"{F} fois par semaine, souvent les mêmes questions.", g:"Assistant" },
+    veille:{  t:"Une veille filtrée sur ce qui vous concerne",
+              w:"{H} heures par an à suivre des sources, pour peu de choses utiles.", g:"Agent" },
     relance:{ t:"Des relances qui partent seules",
               w:"{F} fois par semaine. Une relance oubliée, c'est une affaire perdue sans décision.", g:"Agent" },
     pieces:{  t:"La demande de pièces préparée toute seule",
@@ -1197,7 +1276,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       if (b.imp !== a.imp) return b.imp - a.imp;
       return rang[a.ef] - rang[b.ef];
     });
-    return out.slice(0, 5);
+    return out.slice(0, 4);
   }
   var R = null;
 
@@ -1210,7 +1289,6 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     el("vEyebrow").textContent = R.v.eyebrow;
     el("vTitle").innerHTML     = R.v.title;
     el("vText").textContent    = R.v.text;
-    el("vBadge").textContent   = R.v.tag;
 
     countTo(el("costEur"), R.eurLo, 1250, "");
     el("costH").textContent = nf(R.eurHi) + " €, soit " + nf(Math.round(R.hAn));
@@ -1259,21 +1337,6 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     });
 
     var notes = "";
-    if (A.equipes.id === "sansregle" || A.equipes.id === "inconnu") {
-      notes += '<div class="note warn"><h4>Un point à regarder de près</h4>' +
-        'Elle est déjà là, sans règle écrite. La question n’est plus si, mais quelles informations y passent.</div>';
-    }
-    if (SENSIBLE.indexOf(A.metier.id) > -1 &&
-        (A.equipes.id === "sansregle" || A.equipes.id === "inconnu")) {
-      notes += '<div class="note"><h4>Ce que vos collaborateurs y déposent quitte votre périmètre</h4>' +
-        "Sur un compte personnel, ce qui est collé dans l'outil quitte votre périmètre sans laisser de trace. " +
-        "La question à trancher n'est pas de savoir si l'IA est autorisée, mais quels documents entrent dans son périmètre, et lesquels n'y entrent jamais." +
-        '<span class="small">Nous parlons de réduire et de documenter cette exposition, jamais de la supprimer.</span></div>';
-    }
-    if (A.donnees.indexOf("papier") > -1 && R.num.length > 0) {
-      notes += '<div class="note"><h4>Sur la partie papier</h4>' +
-        'Pas bloquant, mais hors périmètre tant que ce n’est pas repris. Se chiffre séparément.</div>';
-    }
     if (A.dept.id === "oise") {
       notes += '<div class="note fin"><h4>Financement, dans l’Oise</h4>' +
         'Diagnostic 600 € HT, puis 70 % des dépenses pris en charge, plafond 3 000 € HT. Entreprises de l’Oise, moins de 50 salariés et moins de 7 M€ de chiffre d’affaires. ' +
@@ -1285,9 +1348,6 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     }
     el("extraNotes").innerHTML = notes;
 
-    el("tH").textContent = nf(Math.round(R.hAn));
-    el("tE").textContent = nf(R.eurLo) + " \u2192 " + nf(R.eurHi);
-    el("tV").textContent = R.v.tag;
     el("ctaRdv").href = CONFIG.rdv;
     el("ctaTop").href  = CONFIG.rdv;
     el("ctaDock").href = CONFIG.rdv;
