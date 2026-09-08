@@ -126,6 +126,10 @@ main{flex:1; display:flex; justify-content:center; padding:2rem 1.375rem 4rem}
 }
 .q{font-size:clamp(25px,6.6vw,34px); font-weight:800; letter-spacing:-.03em; line-height:1.13; margin-top:.75rem}
 .q .hl{color:var(--cyan)}
+.legend{display:flex; flex-wrap:wrap; align-items:center; gap:.375rem .875rem; font-size:11.5px; font-weight:600; letter-spacing:.02em; color:var(--ink-muted); margin-top:-.5rem}
+.legend .d{width:.6875rem; height:.6875rem; border-radius:4px; display:inline-block; margin-right:.25rem; vertical-align:-1px}
+.legend .cy{background:var(--cyan)}
+.legend .am{background:var(--amber)}
 .hint{font-size:.9375rem; color:var(--ink-muted); line-height:1.6; max-width:40ch}
 .lede{font-size:1.0625rem; color:var(--ink-soft); line-height:1.62; max-width:40ch}
 .head{display:flex; flex-direction:column}
@@ -148,6 +152,16 @@ main{flex:1; display:flex; justify-content:center; padding:2rem 1.375rem 4rem}
 }
 .opt.on .ico{transform:scale(1.06)}
 .opt.on .ico{background:var(--cyan); color:#fff}
+.opt.f-agent .ico{background:#fdf3e2; color:#b0801f}
+.opt.f-agent.on .ico{background:var(--amber); color:#fff}
+.opt.f-agent.on{border-color:var(--amber); background:#fdf7ed; box-shadow:0 10px 26px rgba(216,162,74,.2)}
+.opt.f-agent.on .tick{background:var(--amber); border-color:var(--amber)}
+.opt.f-assist .ico{background:var(--cyan-050); color:var(--cyan)}
+.opt.e-2 .ico{background:#eef4fa; color:#5e6e80}
+.opt.e-3 .ico{background:#fdf3e2; color:#b0801f}
+.opt.e-4 .ico{background:#fdeceb; color:#c0392b}
+.opt.e-4.on{border-color:#e08074; background:#fdf3f2; box-shadow:0 10px 26px rgba(192,57,43,.14)}
+.opt.e-4.on .ico,.opt.e-4.on .tick{background:#c0392b; border-color:#c0392b; color:#fff}
 .opt .ico svg{display:block}
 .opt .tick{
   margin-left:auto; flex:none; width:1.25rem; height:1.25rem; border-radius:7px;
@@ -498,6 +512,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
           <h2 class="q">Lesquelles vous semblent <span class="hl">idiotes à refaire</span> à chaque fois&nbsp;?</h2>
         </div>
         <p class="hint">Jusqu’à trois, les plus pénibles.</p>
+        <p class="legend"><span class="d cy"></span>préparé à votre demande <span class="d am"></span>traité en continu</p>
         <div class="opts" id="optsTache"></div>
         <div class="actions">
           <button class="cta" id="tacheNext" disabled data-go="rythme">Continuer</button>
@@ -922,10 +937,10 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     { id:"v4", label:"plus de 10", v:14 }
   ];
   var ENJEU = [
-    { id:"rien",     label:"Rien de grave, ça se rattrape",        icon:"fixe" },
-    { id:"temps",    label:"On perd du temps à rattraper",         icon:"variante" },
-    { id:"affaires", label:"On perd des affaires",                 icon:"acquisition" },
-    { id:"risque",   label:"On prend un risque, client ou réglementaire", icon:"alerte" }
+    { id:"rien",     label:"Rien de grave, ça se rattrape",        icon:"fixe",        cls:"e-1" },
+    { id:"temps",    label:"On perd du temps à rattraper",         icon:"variante",    cls:"e-2" },
+    { id:"affaires", label:"On perd des affaires",                 icon:"acquisition", cls:"e-3" },
+    { id:"risque",   label:"On prend un risque, client ou réglementaire", icon:"alerte", cls:"e-4" }
   ];
   var EQUIPES = [
     { id:"regle",     label:"Oui, et il existe une règle écrite", icon:"ok" },
@@ -1043,7 +1058,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     items.forEach(function (it) {
       var b = document.createElement("button");
       b.type = "button";
-      b.className = "opt" + (opts.round ? " round" : "");
+      b.className = "opt" + (opts.round ? " round" : "") + (it.cls ? " " + it.cls : "");
       b.dataset.id = it.id || it.label;
       var lab = '<span class="opt-lab"><span>' + it.label + '</span>' +
                 (it.note ? '<span class="opt-note">' + it.note + '</span>' : '') + '</span>';
@@ -1097,9 +1112,12 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
 
   function buildTaches() {
     var list = (TACHES[A.metier.id] || TACHES.autre).map(function (t, i) {
-      return { id:"t" + i, label:t.label, type:t.t, icon:t.t };
+      var g = (RECO_TACHE[t.t] || RECO_TACHE.entrant).g;
+      return { id:"t" + i, label:t.label, type:t.t, icon:t.t,
+               cls:(g === "Agent" ? "f-agent" : "f-assist"), fam:g };
     });
-    list.push({ id:"tx", label:"Une autre tâche qui revient chez moi", type:"entrant", icon:"autre" });
+    list.push({ id:"tx", label:"Une autre tâche qui revient chez moi", type:"entrant",
+                icon:"autre", cls:"f-agent", fam:"Agent" });
     buildOpts(el("optsTache"), list, { onPick: function (it, b) {
       var i = A.taches.indexOf(it);
       if (i > -1) { A.taches.splice(i, 1); b.classList.remove("on"); }
