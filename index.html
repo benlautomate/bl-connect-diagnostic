@@ -486,24 +486,34 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
 
       <section class="screen" id="s-volume" hidden>
         <div class="head"><span class="eyebrow">Question 6</span>
-          <h2 class="q" id="volumeQ">Combien de dossiers ou de demandes traitez-vous par semaine&nbsp;?</h2>
+          <h2 class="q" id="volumeQ">Combien de personnes font ce travail chez vous&nbsp;?</h2>
         </div>
-        <p class="hint">Tous canaux confondus.</p>
+        <p class="hint">Vous compris.</p>
         <div class="opts grid" id="optsVolume"></div>
         <button class="back" data-back="etapes">Revenir</button>
       </section>
 
+      <section class="screen" id="s-enjeu" hidden>
+        <div class="head">
+          <span class="eyebrow">Question 7</span>
+          <h2 class="q">Quand ce n’est pas fait à temps, <span class="hl">il se passe quoi</span>&nbsp;?</h2>
+        </div>
+        <p class="hint">La réponse dit ce que le sujet mérite vraiment.</p>
+        <div class="opts" id="optsEnjeu"></div>
+        <button class="back" data-back="volume">Revenir</button>
+      </section>
+
       <section class="screen" id="s-equipes" hidden>
-        <div class="head"><span class="eyebrow">Question 7</span>
+        <div class="head"><span class="eyebrow">Question 8</span>
           <h2 class="q">Autour de vous, l’IA est déjà utilisée&nbsp;? Et savez-vous quelles données y sont mises&nbsp;?</h2>
         </div>
         <p class="hint">Sans piège : l’usage commence souvent avant la règle.</p>
         <div class="opts" id="optsEquipes"></div>
-        <button class="back" data-back="volume">Revenir</button>
+        <button class="back" data-back="enjeu">Revenir</button>
       </section>
 
       <section class="screen" id="s-contexte" hidden>
-        <div class="head"><span class="eyebrow">Question 8</span>
+        <div class="head"><span class="eyebrow">Question 9</span>
           <h2 class="q">Deux dernières choses, pour chiffrer</h2>
         </div>
         <div class="pair">
@@ -651,7 +661,8 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       { t:"reporting", label:"Produire les situations et tableaux de bord" },
       { t:"recherche", label:"Retrouver une pièce dans un dossier" },
       { t:"facture",   label:"Facturer et suivre les impayés" },
-      { t:"interne",   label:"Répondre aux mêmes questions de l’équipe" }
+      { t:"contenu",     label:"Alimenter votre communication" },
+      { t:"acquisition", label:"Aller chercher de nouveaux clients" }
     ],
     juridique: [
       { t:"pieces",    label:"Réclamer les pièces d’un dossier" },
@@ -662,7 +673,8 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       { t:"relance",   label:"Relancer sur les échéances et les délais" },
       { t:"veille",    label:"Suivre les évolutions réglementaires" },
       { t:"facture",   label:"Facturer le temps passé et relancer" },
-      { t:"interne",   label:"Répondre aux mêmes questions de l’équipe" }
+      { t:"contenu",     label:"Alimenter votre communication" },
+      { t:"acquisition", label:"Aller chercher de nouveaux clients" }
     ],
     etudes: [
       { t:"pieces",    label:"Constituer et vérifier les dossiers techniques" },
@@ -673,7 +685,8 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       { t:"relance",   label:"Relancer les devis sans réponse" },
       { t:"saisie",    label:"Reporter des données d’un document à un outil" },
       { t:"entrant",   label:"Traiter les demandes et les appels d’offres" },
-      { t:"reporting", label:"Produire les états d’avancement" }
+      { t:"contenu",     label:"Alimenter votre communication" },
+      { t:"acquisition", label:"Aller chercher de nouveaux clients" }
     ],
     courtage: [
       { t:"pieces",    label:"Réclamer les pièces d’un dossier de souscription" },
@@ -682,9 +695,10 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       { t:"relance",   label:"Relancer sur les renouvellements" },
       { t:"entrant",   label:"Répondre aux questions sur les garanties" },
       { t:"recherche", label:"Retrouver une condition dans un contrat" },
-      { t:"saisie",    label:"Ressaisir les données dans les extranets" },
       { t:"veille",    label:"Suivre les évolutions de produits et de tarifs" },
-      { t:"facture",   label:"Suivre les commissions et les impayés" }
+      { t:"facture",   label:"Suivre les commissions et les impayés" },
+      { t:"contenu",     label:"Alimenter votre communication" },
+      { t:"acquisition", label:"Aller chercher de nouveaux clients" }
     ],
     formation: [
       { t:"pieces",    label:"Monter les dossiers de financement" },
@@ -695,7 +709,8 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       { t:"recherche", label:"Retrouver un support ou un document de session" },
       { t:"planif",    label:"Organiser les sessions et les intervenants" },
       { t:"facture",   label:"Facturer et suivre les règlements" },
-      { t:"reporting", label:"Produire les bilans et les indicateurs" }
+      { t:"contenu",     label:"Alimenter votre communication" },
+      { t:"acquisition", label:"Aller chercher de nouveaux clients" }
     ],
     technique: [
       { t:"planif",    label:"Planifier les interventions" },
@@ -706,7 +721,8 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       { t:"recherche", label:"Retrouver l’historique d’un client ou d’un site" },
       { t:"saisie",    label:"Ressaisir les rapports terrain dans l’outil" },
       { t:"facture",   label:"Facturer les interventions et relancer" },
-      { t:"reporting", label:"Produire le suivi des contrats de maintenance" }
+      { t:"contenu",     label:"Alimenter votre communication" },
+      { t:"acquisition", label:"Aller chercher de nouveaux clients" }
     ],
     batiment: [
       { t:"doc",       label:"Chiffrer les devis" },
@@ -717,7 +733,8 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       { t:"planif",    label:"Organiser les plannings de chantier" },
       { t:"saisie",    label:"Ressaisir les heures et les fournitures" },
       { t:"facture",   label:"Facturer les situations et relancer les impayés" },
-      { t:"controle",  label:"Vérifier un dossier avant de le rendre" }
+      { t:"contenu",     label:"Alimenter votre communication" },
+      { t:"acquisition", label:"Aller chercher de nouveaux clients" }
     ],
     autre: [
       { t:"entrant",   label:"Traiter les demandes entrantes" },
@@ -726,13 +743,26 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       { t:"doc",       label:"Produire des documents récurrents" },
       { t:"recherche", label:"Retrouver une information dans vos documents" },
       { t:"saisie",    label:"Reporter des données d’un support à un autre" },
-      { t:"controle",  label:"Vérifier et relire avant envoi" },
       { t:"facture",   label:"Facturer et suivre les règlements" },
-      { t:"interne",   label:"Répondre aux mêmes questions de l’équipe" }
+      { t:"interne",   label:"Répondre aux mêmes questions de l’équipe" },
+      { t:"contenu",     label:"Alimenter votre communication" },
+      { t:"acquisition", label:"Aller chercher de nouveaux clients" }
     ]
   };
 
   var SCENES = {
+    contenu: {
+      surveille:"vos dossiers marquants et votre calendrier",
+      detecte:"un sujet qui mérite d’être raconté",
+      agit:"rédige la publication dans votre ton, à partir de vos éléments",
+      arrete:"avant publication. Vous relisez ce qui porte votre nom"
+    },
+    acquisition: {
+      surveille:"vos cibles et les signaux qui les concernent",
+      detecte:"le bon moment et le bon motif pour prendre contact",
+      agit:"prépare le message personnalisé et tient le fil du suivi",
+      arrete:"avant l’envoi. Vous validez qui reçoit quoi"
+    },
     saisie: {
       surveille:"les documents qui arrivent et attendent d’être saisis",
       detecte:"les informations à reporter et leur destination",
@@ -858,10 +888,16 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     { id:"rarement", label:"Non, chaque cas est différent", icon:"unique" }
   ];
   var VOLUME = [
-    { id:"v1", label:"moins de 5", v:3 },
-    { id:"v2", label:"5 à 20",     v:12 },
-    { id:"v3", label:"20 à 50",    v:35 },
-    { id:"v4", label:"plus de 50", v:70 }
+    { id:"v1", label:"1",         v:1 },
+    { id:"v2", label:"2 à 3",     v:2.5 },
+    { id:"v3", label:"4 à 10",    v:6 },
+    { id:"v4", label:"plus de 10", v:14 }
+  ];
+  var ENJEU = [
+    { id:"rien",     label:"Rien de grave, ça se rattrape",        icon:"fixe" },
+    { id:"temps",    label:"On perd du temps à rattraper",         icon:"variante" },
+    { id:"affaires", label:"On perd des affaires",                 icon:"acquisition" },
+    { id:"risque",   label:"On prend un risque, client ou réglementaire", icon:"alerte" }
   ];
   var EQUIPES = [
     { id:"regle",     label:"Oui, et il existe une règle écrite", icon:"ok" },
@@ -875,11 +911,11 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
      ======================================================================= */
   var A = { metier:null, taches:[], freq:null, duree:null, donnees:[],
             etapes:null, volume:null, equipes:null,
-            taux:null, dept:null, suite:null };
+            taux:null, dept:null, suite:null, enjeu:null };
 
-  var ORDER = ["intro","metier","tache","rythme","donnees","etapes","volume","equipes","contexte","result"];
-  var STEPS = { metier:1, tache:2, rythme:3, donnees:4, etapes:5, volume:6, equipes:7, contexte:8 };
-  var NB_Q = 8;
+  var ORDER = ["intro","metier","tache","rythme","donnees","etapes","volume","enjeu","equipes","contexte","result"];
+  var STEPS = { metier:1, tache:2, rythme:3, donnees:4, etapes:5, volume:6, enjeu:7, equipes:8, contexte:9 };
+  var NB_Q = 9;
   var current = "intro";
 
   var $  = function (s) { return document.querySelector(s); };
@@ -954,6 +990,8 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     facture:'<path d="M5 2.6h10v14.8l-2.5-1.6-2.5 1.6-2.5-1.6L5 17.4z"/><path d="M8 7.4h4M8 10.6h4"/>',
     fixe:'<path d="M3.4 10h13.2"/><circle cx="6.6" cy="10" r="1.6"/><circle cx="13.4" cy="10" r="1.6"/>',
     variante:'<path d="M3.4 6.6h13.2M3.4 13.4h13.2"/><circle cx="7.4" cy="6.6" r="1.5"/><circle cx="12.6" cy="13.4" r="1.5"/>',
+    contenu:'<path d="M13.4 3.4 16.6 6.6 7.4 15.8l-4 .8.8-4z"/><path d="M11.8 5 15 8.2"/>',
+    acquisition:'<circle cx="10" cy="10" r="7"/><circle cx="10" cy="10" r="3.4"/><circle cx="10" cy="10" r=".9" fill="currentColor"/>',
     controle:'<circle cx="10" cy="10" r="7.2"/><path d="m6.8 10.2 2.2 2.2 4.2-4.6"/>',
     reporting:'<path d="M3.6 16.4V9.2M8.6 16.4V4.4M13.6 16.4v-5M3 16.4h14"/>',
     interne:'<circle cx="7.4" cy="7.2" r="2.6"/><circle cx="13.6" cy="9" r="2"/><path d="M2.8 16.4a4.6 4.6 0 0 1 9.2 0M13 16.4a3.4 3.4 0 0 1 4.2-3.3"/>',
@@ -994,7 +1032,8 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       var b = document.createElement("button");
       b.type = "button";
       b.className = "opt";
-      b.innerHTML = '<span class="opt-num">' + it.label + '</span><span class="opt-note">par semaine</span>';
+      b.innerHTML = '<span class="opt-num">' + it.label + '</span><span class="opt-note">' +
+        (it.label === "1" ? "personne" : "personnes") + '</span>';
       b.addEventListener("click", function () { onPick(it, b, container); });
       container.appendChild(b);
     });
@@ -1064,8 +1103,13 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
 
   buildGrid(el("optsVolume"), VOLUME, function (it, b, c) {
     A.volume = it; single(c, b);
-    setTimeout(function () { show("equipes"); }, 120);
+    setTimeout(function () { show("enjeu"); }, 160);
   });
+
+  buildOpts(el("optsEnjeu"), ENJEU, { round:true, onPick: function (it, b, c) {
+    A.enjeu = it; single(c, b);
+    setTimeout(function () { show("equipes"); }, 160);
+  }});
 
   buildOpts(el("optsEquipes"), EQUIPES, { round:true, onPick: function (it, b, c) {
     A.equipes = it; single(c, b);
@@ -1115,7 +1159,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       { ok:A.freq.v >= 3,               txt:"Elle revient au moins trois fois par semaine" },
       { ok:num.length > 0,              txt:"L’information vit dans un outil, pas seulement dans les têtes" },
       { ok:A.etapes.id !== "rarement",  txt:"Les étapes sont stables d’une fois sur l’autre" },
-      { ok:A.volume.v >= 12,            txt:"Le volume justifie de s’en occuper" }
+      { ok:A.volume.v >= 2.5,           txt:"Plusieurs personnes sont concernées" }
     ];
     var score = conds.filter(function (c) { return c.ok; }).length;
 
@@ -1128,7 +1172,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
         title:"D’abord rendre cette information <span class=\"hl\">lisible</span>",
         text:"Un système ne lit que ce qui existe quelque part. Ni sur un drive, ni dans un logiciel aujourd’hui.",
         tag:"Première étape avant tout outil" };
-    } else if (num.length >= 3 || (A.volume.v >= 50 && num.length >= 2)) {
+    } else if (num.length >= 3 || (A.volume.v >= 6 && num.length >= 2)) {
       v = { key:"plateforme", eyebrow:"Ce qui est faisable chez vous",
         title:"Votre sujet, c’est <span class=\"hl\">l’éparpillement</span>",
         text:"Votre information vit à " + num.length + " endroits. Chaque tâche repaie le même coût de recherche.",
@@ -1164,6 +1208,10 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
 
   /* ---------------- preconisations ---------------- */
   var SOLUTION = {
+    contenu:{ t:"Un assistant de contenu dans votre voix",
+             d:"Il part de vos dossiers, de vos notes et de votre façon d’écrire pour produire vos publications, prêtes à relire." },
+    acquisition:{ t:"Un agent de prise de contact et de suivi",
+             d:"Il prépare les approches personnalisées, tient le fil des relances et vous laisse valider chaque envoi." },
     saisie:{ t:"Un agent de saisie depuis vos documents",
              d:"Il lit les documents reçus, en extrait les informations utiles et prépare la saisie dans votre outil, prête à valider." },
     controle:{ t:"Un assistant de contrôle",
@@ -1193,6 +1241,10 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
   };
 
   var RECO_TACHE = {
+    contenu:{ t:"Vos publications préparées dans votre ton",
+              w:"{H} heures par an, et une communication qui s’arrête dès que la charge monte.", g:"Assistant" },
+    acquisition:{ t:"La prise de contact préparée et suivie",
+              w:"{F} fois par semaine, et un suivi qui s’effrite dès qu’on est pris.", g:"Agent" },
     saisie:{  t:"La saisie préparée depuis vos documents",
               w:"{F} fois par semaine de recopie sans valeur ajoutée.", g:"Agent" },
     controle:{t:"Une relecture avant la vôtre",
@@ -1230,10 +1282,11 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
 
   function buildRecos(R) {
     var out = [], nSrc = R.num.length, v_key = R.v.key;
+    var chaud = A.enjeu && (A.enjeu.id === "affaires" || A.enjeu.id === "risque");
     A.taches.forEach(function (t, k) {
       var sol  = SOLUTION[t.type] || SOLUTION.entrant;
       var base = RECO_TACHE[t.type] || RECO_TACHE.entrant;
-      out.push({ p:100 - k, imp:(k === 0 ? 3 : 2),
+      out.push({ p:100 - k, imp:(k === 0 || chaud ? 3 : 2),
         ef:(base.g === "Agent" ? "moyen" : "rapide"),
         t:sol.t, w:sol.d, g:base.g });
     });
@@ -1249,7 +1302,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       out.push({ p:90, imp:3, ef:"long", t:"Une plateforme métier sur votre nomenclature",
         w:"Vos documents arrivent d'où qu'ils viennent, se classent par dossier et se retrouvent en une question. Construite sur votre façon de nommer les choses.", g:"Plateforme" });
     }
-    if (A.volume.v >= 35) {
+    if (A.volume.v >= 4) {
       out.push({ p:70, imp:2, ef:"moyen", t:"Une file d'entrée qualifiée",
         w:"Chaque demande arrive avec son objet, son urgence et son dossier. Vous ouvrez votre journée sur une liste déjà triée.", g:"Agent" });
     }
@@ -1369,7 +1422,8 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       return DONNEES.filter(function (d) { return d.id === id; })[0].label.toLowerCase();
     }).join(", "));
     L.push("Étapes : " + A.etapes.label);
-    L.push("Volume traité : " + A.volume.label + " dossiers ou demandes par semaine");
+    L.push("Personnes concernées : " + A.volume.label);
+    L.push("Si ce n est pas fait : " + A.enjeu.label);
     L.push("IA déjà utilisée : " + A.equipes.label);
     L.push("Coût horaire indiqué : " + A.taux.label);
     L.push("Suite bureautique : " + A.suite.label);
@@ -1439,7 +1493,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
      ======================================================================= */
   el("restart").addEventListener("click", function () {
     A = { metier:null, taches:[], freq:null, duree:null, donnees:[],
-          etapes:null, volume:null, equipes:null, taux:null, dept:null, suite:null };
+          etapes:null, volume:null, equipes:null, taux:null, dept:null, suite:null, enjeu:null };
     document.querySelectorAll(".opt.on, .chip.on").forEach(function (n) { n.classList.remove("on"); });
     var d = el("dock"); if (d) d.classList.remove("on");
     el("tacheNext").disabled = true;
