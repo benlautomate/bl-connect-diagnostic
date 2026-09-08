@@ -262,6 +262,29 @@ main{flex:1; display:flex; justify-content:center; padding:2rem 1.375rem 4rem}
 .reco-item.cadrage .reco-tag{color:#a97a26; background:var(--amber-050)}
 .reco-tag.ent{color:var(--marine); background:#e6eef7}
 
+/* ---------- pistes ---------- */
+.reco{padding:0; overflow:hidden; background:linear-gradient(180deg,#fbfdff,#f5f9fd); border-color:var(--line)}
+.reco-head{padding:1.5rem 1.5rem 1.125rem; border-bottom:1px solid var(--line)}
+.reco-item{align-items:start; background:#fff; border-bottom:1px solid var(--line)}
+.reco-item.first{background:linear-gradient(150deg, rgba(5,159,217,.09), rgba(255,255,255,0) 62%)}
+.meta{display:flex; flex-wrap:wrap; align-items:center; gap:.5rem .875rem; margin-top:.6875rem}
+.bars{display:flex; align-items:center; gap:.375rem; font-size:10px; font-weight:700; letter-spacing:.11em; text-transform:uppercase; color:var(--ink-muted)}
+.bars i{display:flex; gap:2.5px}
+.bars i b{width:14px; height:5px; border-radius:3px; background:var(--line); display:block}
+.bars i b.on{background:var(--cyan)}
+.reco-item.amb .bars i b.on{background:var(--amber)}
+.effort{
+  font-size:10px; font-weight:700; letter-spacing:.11em; text-transform:uppercase;
+  border-radius:999px; padding:.25rem .625rem; background:var(--surface-soft);
+  color:var(--ink-muted); border:1px solid var(--line);
+}
+.effort.rapide{background:#eaf7ef; color:#1d7a45; border-color:#c5e6d2}
+.effort.moyen{background:var(--cyan-050); color:#046f96; border-color:var(--cyan-200)}
+.effort.long{background:#fdf3e2; color:#b0801f; border-color:#f0dcb4}
+.reco-w{display:none}
+.reco-item{padding:1rem 1.5rem}
+.meta{margin-top:.5rem}
+
 /* ---------- notes ---------- */
 .note{border-radius:18px; padding:1.1875rem 1.25rem; font-size:.9063rem; line-height:1.6; color:var(--ink-soft); border:1px solid var(--line); background:var(--surface-soft); margin-bottom:.875rem}
 .note:last-child{margin-bottom:0}
@@ -521,15 +544,6 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
           </div>
         </div>
 
-        <div class="card seq">
-          <div class="seq-head">
-            <span class="eyebrow" id="solTag">Solution 01</span>
-            <h3 id="solTitle"></h3>
-            <span class="tag" id="seqTag"></span>
-          </div>
-          <ol class="seq-rows" id="seqRows"></ol>
-        </div>
-
         <div class="panel fam">
           <div class="fam-head">
             <h3>Les quatre façons de faire travailler l’IA</h3>
@@ -540,8 +554,8 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
 
         <div class="card reco">
           <div class="reco-head">
-            <h3>Et aussi, dans l’ordre</h3>
-            <p>On installe une chose à la fois, chacune chiffrée à part.</p>
+            <h3>Vos pistes, classées</h3>
+            <p>Par impact, puis par rapidité de mise en place.</p>
           </div>
           <ol class="reco-list" id="recoList"></ol>
         </div>
@@ -1165,44 +1179,54 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     return "entreprise";
   }
 
+  var EFFORT = { rapide:"Rapide", moyen:"Quelques semaines", long:"Structurant" };
+
   function buildRecos(R) {
     var out = [], nSrc = R.num.length, v_key = R.v.key;
+    var sol = SOLUTION[A.tache.type] || SOLUTION.entrant;
+    var base = RECO_TACHE[A.tache.type] || RECO_TACHE.entrant;
+    out.push({ p:100, imp:3, ef:(base.g === "Agent" ? "moyen" : "rapide"), t:sol.t,
+      w:sol.d, g:base.g });
 
     if (nSrc === 0) {
-      out.push({ p:200, pre:true, t:"Poser l'information quelque part de lisible",
+      out.push({ p:200, imp:3, ef:"moyen", pre:true, t:"Poser l'information quelque part de lisible",
         w:"On identifie le minimum à sortir du papier et des têtes, et on le range dans un endroit que les outils peuvent lire. Rien de plus.", g:"Préalable" });
     } else if (A.donnees.indexOf("papier") > -1) {
-      out.push({ p:40, pre:true, t:"Reprendre la part encore sur papier",
+      out.push({ p:40, imp:1, ef:"moyen", pre:true, t:"Reprendre la part encore sur papier",
         w:"Numérisation et indexation de ce qui doit entrer dans le périmètre, pour qu'il devienne exploitable. Chiffré séparément.", g:"Préalable" });
     }
     if (nSrc >= 3) {
-      out.push({ p:90, t:"Une plateforme métier sur votre nomenclature",
+      out.push({ p:90, imp:3, ef:"long", t:"Une plateforme métier sur votre nomenclature",
         w:"Vos documents arrivent d'où qu'ils viennent, se classent par dossier et se retrouvent en une question. Construite sur votre façon de nommer les choses.", g:"Plateforme" });
     }
     if (A.volume.v >= 35) {
-      out.push({ p:70, t:"Une file d'entrée qualifiée",
+      out.push({ p:70, imp:2, ef:"moyen", t:"Une file d'entrée qualifiée",
         w:"Chaque demande arrive avec son objet, son urgence et son dossier. Vous ouvrez votre journée sur une liste déjà triée.", g:"Agent" });
     }
     if (A.equipes.id === "sansregle" || A.equipes.id === "inconnu") {
-      out.push({ p:80, t:"Une charte d'usage de l'IA, écrite avec vos équipes",
+      out.push({ p:80, imp:2, ef:"rapide", t:"Une charte d'usage de l'IA, écrite avec vos équipes",
         w:"Une demi-journée : ce qui peut entrer dans un outil d'IA, ce qui n'y entre jamais, et le document que tout le monde signe.", g:"Formation" });
-      out.push({ p:78, t:"Une IA d'entreprise dans " + A.suite.nom,
+      out.push({ p:78, imp:2, ef:"rapide", t:"Une IA d'entreprise dans " + A.suite.nom,
         w:"Un accès d'entreprise pour l'équipe, branché sur vos outils, plus les trois cas d'usage qui servent tous les jours. Les échanges restent dans votre périmètre.",
         g:"IA d'entreprise" });
     } else if (A.equipes.id === "regle" || A.equipes.id === "non") {
-      out.push({ p:35, t:"Une IA d'entreprise dans " + A.suite.nom,
+      out.push({ p:35, imp:2, ef:"rapide", t:"Une IA d'entreprise dans " + A.suite.nom,
         w:"Un accès commun sur vos outils actuels, et les cas d'usage installés avec l'équipe, plutôt que des abonnements dispersés que personne n'utilise.",
         g:"IA d'entreprise" });
     }
     if (A.etapes.id !== "toujours") {
-      out.push({ p:85, t:"Un atelier pour écrire le chemin réel",
+      out.push({ p:85, imp:2, ef:"rapide", t:"Un atelier pour écrire le chemin réel",
         w:"On pose les étapes, les cas particuliers et les points de validation. C'est ce document qui rend l'automatisation possible ensuite.", g:"Cadrage" });
     }
     if (v_key === "plateforme") out = out.filter(function (o) { return o.g !== "Plateforme"; });
     if (v_key === "agent-cadre" || v_key === "cadre") out = out.filter(function (o) { return o.g !== "Cadrage"; });
     if (v_key === "amont") out = out.filter(function (o) { return o.t.indexOf("Poser l'information") !== 0; });
-    out.sort(function (a, b) { return b.p - a.p; });
-    return out.slice(0, 4);
+    var rang = { rapide:0, moyen:1, long:2 };
+    out.sort(function (a, b) {
+      if (b.imp !== a.imp) return b.imp - a.imp;
+      return rang[a.ef] - rang[b.ef];
+    });
+    return out.slice(0, 5);
   }
   var R = null;
 
@@ -1222,33 +1246,6 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     el("costCalc").textContent =
       A.freq.label + " fois par semaine, " + A.duree.label + ", sur " +
       CONFIG.semaines + " semaines. Votre calcul, pas le nôtre.";
-
-    var sol = SOLUTION[A.tache.type] || SOLUTION.entrant;
-    el("solTitle").textContent = sol.t;
-    el("solTag").textContent = "Solution 01 · " + (R.v.tag || "");
-    var sc = SCENES[A.tache.type] || SCENES.entrant;
-    el("seqTag").textContent = R.v.key === "amont"
-      ? sol.d + " Possible une fois l’information atteignable."
-      : sol.d;
-    var rows = [
-      ["Surveille", sc.surveille, false],
-      ["Détecte",   sc.detecte,   false],
-      ["Agit",      sc.agit,      false],
-      ["S’arrête",  sc.arrete,    true]
-    ];
-    var ol = el("seqRows");
-    ol.innerHTML = "";
-    rows.forEach(function (r, i) {
-      var li = document.createElement("li");
-      li.className = "seq-row" + (r[2] ? " stop" : "");
-      li.style.animationDelay = (0.12 + i * 0.11) + "s";
-      li.innerHTML = '<span class="seq-dot">' +
-        (r[2]
-          ? '<svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 4v4M8 4v4"/></svg>'
-          : '<svg width="11" height="11" viewBox="0 0 12 12" fill="currentColor"><circle cx="6" cy="6" r="2.6"/></svg>') +
-        '</span><span><span class="seq-verb">' + r[0] + '</span><span class="seq-what">' + r[1] + '</span></span>';
-      ol.appendChild(li);
-    });
 
     el("gaugeNum").textContent = R.score;
     var C = 2 * Math.PI * 44;
@@ -1289,13 +1286,18 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       li.className = "reco-item" + (i === 0 ? " first" : "");
       var chaud = r.pre || r.g === "Cadrage" || r.g === "Formation" || r.g === "IA d'entreprise";
       if (chaud) li.className += " amb";
+      var bars = '<i>' + [1,2,3].map(function (n) {
+        return '<b class="' + (n <= r.imp ? "on" : "") + '"></b>';
+      }).join("") + '</i>';
       li.innerHTML =
         '<span class="reco-n" data-n="' + (i + 1) + '"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" ' +
         'stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' +
         I[FAM_ICO[r.g] || "doc"] + '</svg></span>' +
         '<span><span class="reco-tag' + (chaud ? " pre" : "") + '">' + r.g + '</span>' +
         '<span class="reco-t">' + r.t + '</span>' +
-        '<span class="reco-w">' + r.w + '</span></span>';
+        '<span class="reco-w">' + r.w + '</span>' +
+        '<span class="meta"><span class="bars">Impact ' + bars + '</span>' +
+        '<span class="effort ' + r.ef + '">' + EFFORT[r.ef] + '</span></span></span>';
       ro.appendChild(li);
     });
 
@@ -1364,13 +1366,9 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     L.push(R.v.title.replace(/<[^>]+>/g, ""));
     L.push(R.v.text);
     L.push("");
-    L.push("SOLUTION PRINCIPALE");
-    L.push((SOLUTION[A.tache.type] || SOLUTION.entrant).t);
-    L.push((SOLUTION[A.tache.type] || SOLUTION.entrant).d);
-    L.push("");
-    L.push("ET AUSSI, DANS L ORDRE");
+    L.push("VOS PISTES, CLASSEES");
     buildRecos(R).forEach(function (r, i) {
-      L.push((i + 1) + ". " + r.t + " [" + r.g + "]");
+      L.push((i + 1) + ". " + r.t + " [" + r.g + " | impact " + r.imp + "/3 | " + EFFORT[r.ef] + "]");
       L.push("   " + r.w);
     });
     L.push("");
