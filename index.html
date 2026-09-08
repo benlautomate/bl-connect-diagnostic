@@ -500,9 +500,9 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
 
       <section class="screen" id="s-tache" hidden>
         <div class="head"><span class="eyebrow">Question 2</span>
-          <h2 class="q">Lesquelles vous semblent <span class="hl">idiotes à refaire</span> à chaque fois&nbsp;?</h2>
+          <h2 class="q">Lesquelles vous prennent du temps <span class="hl">sans demander votre expertise</span>&nbsp;?</h2>
         </div>
-        <p class="hint">Jusqu’à trois, les plus pénibles.</p>
+        <p class="hint">Jusqu’à trois. Nécessaires, mais elles n’ont pas besoin de vous.</p>
         <p class="legend"><span class="d cy"></span>préparé à votre demande <span class="d am"></span>traité en continu</p>
         <div class="opts" id="optsTache"></div>
         <div class="actions">
@@ -1323,7 +1323,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     acquisition:{ t:"La prise de contact préparée et suivie",
               w:"{F} fois par semaine, et un suivi qui s’effrite dès qu’on est pris.", g:"Agent" },
     saisie:{  t:"La saisie préparée depuis vos documents",
-              w:"{F} fois par semaine de recopie sans valeur ajoutée.", g:"Agent" },
+              w:"{F} fois par semaine de recopie, pour un travail qui doit être exact mais pas expert.", g:"Agent" },
     controle:{t:"Une relecture avant la vôtre",
               w:"{H} heures par an de vérification. Les écarts remontent avant vous.", g:"Assistant" },
     facture:{ t:"Facturation et impayés suivis",
@@ -1641,7 +1641,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     A.metier = found;
     buildTaches();
     el("s-tache").querySelector(".hint").textContent =
-      found.label + ". Celle qui revient et qui n’apporte rien. Une seule, la plus pénible.";
+      found.label + ". Jusqu’à trois, celles qui vous coûtent le plus de temps.";
     show("tache");
   })();
 })();
