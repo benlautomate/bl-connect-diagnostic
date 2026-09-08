@@ -291,6 +291,8 @@ main{flex:1; display:flex; justify-content:center; padding:2rem 1.375rem 4rem}
 .bars i b{width:14px; height:5px; border-radius:3px; background:var(--line); display:block}
 .bars i b.on{background:var(--cyan)}
 .reco-item.amb .bars i b.on{background:var(--amber)}
+.gain.cond{color:var(--ink-muted)}
+.gain em{display:block; font-style:normal; font-size:10.5px; font-weight:600; letter-spacing:.02em; color:var(--ink-dim); margin-top:.125rem}
 .gain{font-size:12.5px; font-weight:800; letter-spacing:-.015em; color:var(--cyan); font-variant-numeric:tabular-nums}
 .reco-item.amb .gain{color:#b0801f}
 .close #extraNotes{margin-top:.25rem}
@@ -305,7 +307,7 @@ main{flex:1; display:flex; justify-content:center; padding:2rem 1.375rem 4rem}
 .effort.rapide{background:#eaf7ef; color:#1d7a45; border-color:#c5e6d2}
 .effort.moyen{background:var(--cyan-050); color:#046f96; border-color:var(--cyan-200)}
 .effort.long{background:#fdf3e2; color:#b0801f; border-color:#f0dcb4}
-.reco-w{display:none}
+.reco-w{font-size:.875rem; color:var(--ink-muted); line-height:1.5; margin-top:.375rem; display:block}
 .reco-item{padding:1rem 1.5rem}
 .meta{margin-top:.5rem}
 
@@ -528,20 +530,23 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
         </div>
         <p class="hint">Sans piège : l’usage commence souvent avant la règle.</p>
         <div class="opts" id="optsEquipes"></div>
-        <button class="back" data-back="enjeu">Revenir</button>
+        <div class="pair" id="pairSuite" hidden>
+          <span class="pair-lab">Vos équipes travaillent sur</span>
+          <div class="chips" id="chipsSuite"></div>
+        </div>
+        <div class="actions">
+          <button class="cta" id="equipesNext" disabled data-go="contexte">Continuer</button>
+          <button class="back" data-back="enjeu">Revenir</button>
+        </div>
       </section>
 
       <section class="screen" id="s-contexte" hidden>
         <div class="head"><span class="eyebrow">Question 9</span>
-          <h2 class="q">Deux dernières choses, pour chiffrer</h2>
+          <h2 class="q">Deux dernières choses, <span class="hl">pour chiffrer</span></h2>
         </div>
         <div class="pair">
           <span class="pair-lab">Coût horaire de la personne qui fait cette tâche, charges comprises</span>
           <div class="chips" id="chipsTaux"></div>
-        </div>
-        <div class="pair">
-          <span class="pair-lab">Vos équipes travaillent sur</span>
-          <div class="chips" id="chipsSuite"></div>
         </div>
         <div class="pair">
           <span class="pair-lab">Où êtes-vous&nbsp;?</span>
@@ -587,6 +592,11 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
             <div class="field"><label for="fMail">Email</label><input id="fMail" type="email" autocomplete="email" placeholder="vous@cabinet.fr"></div>
           </div>
           <button class="cta ghost" id="sendBtn">Recevoir ce diagnostic</button>
+          <form name="diagnostic" data-netlify="true" netlify-honeypot="societe" hidden>
+            <input type="text" name="prenom"><input type="email" name="email">
+            <input type="text" name="metier"><input type="text" name="montant">
+            <input type="text" name="societe"><textarea name="diagnostic"></textarea>
+          </form>
           <p class="hint tight" id="sendHint">Votre messagerie s’ouvre pré-remplie.</p>
           <div id="extraNotes"></div>
           <div class="qr-box" id="qrBox">
@@ -625,7 +635,11 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     rdv:    "https://calendly.com/benjcailhol/rdv-decouverte",  // echange decouverte, 30 min
     landing:"https://www.bl-connect.fr",                // page visée par le QR (réseaux + rendez-vous)
     email:  "benjamin@bl-connect.fr",                   // destinataire du diagnostic
-    semaines: 46                                        // semaines travaillées par an
+    semaines: 46,                                       // semaines travaillées par an
+    // Où déposer les diagnostics reçus. "/" fonctionne tel quel si la page est
+    // hébergée sur Netlify (activer le formulaire "diagnostic" dans l'interface).
+    // Sinon, mettre ici l'adresse fournie par votre hébergeur.
+    depot:  "/"
   };
 
   /* =======================================================================
@@ -1123,13 +1137,15 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
 
   buildOpts(el("optsEquipes"), EQUIPES, { round:true, onPick: function (it, b, c) {
     A.equipes = it; single(c, b);
-    setTimeout(function () { show("contexte"); }, 160);
+    el("pairSuite").hidden = false;
+    checkEquipes();
   }});
+  function checkEquipes() { el("equipesNext").disabled = !(A.equipes && A.suite); }
 
   buildChips(el("chipsTaux"), TAUX, function (it) { A.taux = it; checkContexte(); });
-  buildChips(el("chipsSuite"), SUITE, function (it) { A.suite = it; checkContexte(); });
+  buildChips(el("chipsSuite"), SUITE, function (it) { A.suite = it; checkEquipes(); });
   buildChips(el("chipsDept"), DEPT, function (it) { A.dept = it; checkContexte(); });
-  function checkContexte() { el("contexteNext").disabled = !(A.taux && A.dept && A.suite); }
+  function checkContexte() { el("contexteNext").disabled = !(A.taux && A.dept); }
 
   el("contexteNext").addEventListener("click", function () {
     if (this.disabled) return;
@@ -1304,15 +1320,16 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     var out = [], nSrc = R.num.length, v_key = R.v.key;
     var chaud = A.enjeu && (A.enjeu.id === "affaires" || A.enjeu.id === "risque");
     if (A.volume.v <= 1) {
-      out.push({ imp:2, ef:"rapide", t:"Un accès professionnel à l'IA, sur vos outils",
-        w:"", g:"IA d'entreprise" });
+      out.push({ imp:2, ef:"rapide", t:"Un accès professionnel à l\u2019IA, sur vos outils",
+        w:"Vous êtes seul à faire ce travail : l\u2019enjeu n\u2019est pas le cadre commun, c\u2019est d\u2019avoir un outil qui connaît vos dossiers.",
+        g:"IA d\u2019entreprise" });
     }
     A.taches.forEach(function (t) {
       var sol  = SOLUTION[t.type] || SOLUTION.entrant;
       var base = RECO_TACHE[t.type] || RECO_TACHE.entrant;
       out.push({ eur:t.eurLo, eurHi:t.eurHi, imp:(chaud ? 3 : 2),
         ef:(base.g === "Agent" ? "moyen" : "rapide"),
-        t:sol.t, g:base.g });
+        t:sol.t, w:sol.d, g:base.g });
     });
 
     if (nSrc === 0) {
@@ -1333,8 +1350,9 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     var seul = A.volume.v <= 1, equipe = A.volume.v >= 4;
 
     if (equipe) {
-      out.push({ imp:3, ef:"moyen", t:"Une seule façon de faire, la même pour tous",
-        w:"", g:"Plateforme" });
+      out.push({ imp:3, ef:"moyen", t:"Le même mode opératoire pour toute l\u2019équipe",
+        w:"À plusieurs sur le même travail, chacun a ses habitudes. On fixe une façon de faire et l\u2019outil la porte, pour que le résultat ne dépende plus de qui s\u2019en occupe.",
+        g:"Plateforme" });
     }
 
     if (!seul && (A.equipes.id === "sansregle" || A.equipes.id === "inconnu")) {
@@ -1356,12 +1374,14 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     if (v_key === "agent-cadre" || v_key === "cadre") out = out.filter(function (o) { return o.g !== "Cadrage"; });
     if (v_key === "amont") out = out.filter(function (o) { return o.t.indexOf("Poser l'information") !== 0; });
     var rang = { rapide:0, moyen:1, long:2 };
-    out.sort(function (a, b) {
+    function classe(a, b) {
       if ((b.eur || 0) !== (a.eur || 0)) return (b.eur || 0) - (a.eur || 0);
       if (b.imp !== a.imp) return b.imp - a.imp;
       return rang[a.ef] - rang[b.ef];
-    });
-    return out.slice(0, 4);
+    }
+    var chiffrees  = out.filter(function (o) { return o.eur; }).sort(classe);
+    var transverse = out.filter(function (o) { return !o.eur; }).sort(classe);
+    return chiffrees.slice(0, 3).concat(transverse.slice(0, 2)).slice(0, 5);
   }
   var R = null;
 
@@ -1393,8 +1413,11 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
         I[FAM_ICO[r.g] || "doc"] + '</svg></span>' +
         '<span><span class="reco-tag' + (chaudTag ? " pre" : "") + '">' + r.g + '</span>' +
         '<span class="reco-t">' + r.t + '</span>' +
+        (i === 0 && r.w ? '<span class="reco-w">' + r.w + '</span>' : '') +
         '<span class="meta">' +
-        (r.eur ? '<span class="gain">' + nf(r.eur) + " \u2192 " + nf(r.eurHi) + ' \u20ac / an</span>' : '') +
+        (r.eur ? '<span class="gain' + (R.v.key === "amont" ? " cond" : "") + '">' +
+          nf(r.eur) + " \u2192 " + nf(r.eurHi) + ' \u20ac / an' +
+          (R.v.key === "amont" ? '<em>une fois l\u2019information atteignable</em>' : '') + '</span>' : '') +
         '<span class="effort ' + r.ef + '">' + EFFORT[r.ef] + '</span></span></span>';
       ro.appendChild(li);
     });
@@ -1476,12 +1499,47 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     }
     hint.style.color = "";
     hint.textContent = "Votre messagerie s’ouvre. Relisez, puis envoyez.";
-    var body = "Bonjour,\n\nVoici le diagnostic que je viens de remplir.\n\n" + summary() +
+    var texte = summary();
+    var body = "Bonjour,\n\nVoici le diagnostic que je viens de remplir.\n\n" + texte +
                "\n\n" + p + "\n" + m + "\n";
-    window.location.href = "mailto:" + encodeURIComponent(CONFIG.email) +
-      "?cc=" + encodeURIComponent(m) +
-      "&subject=" + encodeURIComponent("Diagnostic B&L Connect - " + p) +
-      "&body=" + encodeURIComponent(body);
+
+    function parMessagerie() {
+      window.location.href = "mailto:" + encodeURIComponent(CONFIG.email) +
+        "?cc=" + encodeURIComponent(m) +
+        "&subject=" + encodeURIComponent("Diagnostic B&L Connect - " + p) +
+        "&body=" + encodeURIComponent(body);
+    }
+
+    var champs = {
+      "form-name":"diagnostic", prenom:p, email:m,
+      metier:A.metier.label,
+      montant:nf(R.eurLo) + " a " + nf(R.eurHi) + " EUR/an",
+      diagnostic:texte
+    };
+    var corps = Object.keys(champs).map(function (k) {
+      return encodeURIComponent(k) + "=" + encodeURIComponent(champs[k]);
+    }).join("&");
+
+    hint.textContent = "Envoi en cours\u2026";
+    var fini = false;
+    var secours = setTimeout(function () { if (!fini) { fini = true; parMessagerie(); } }, 4000);
+
+    fetch(CONFIG.depot, {
+      method:"POST",
+      headers:{ "Content-Type":"application/x-www-form-urlencoded" },
+      body:corps
+    }).then(function (r) {
+      if (fini) return;
+      fini = true; clearTimeout(secours);
+      if (r.ok) {
+        hint.textContent = "C\u2019est envoy\u00e9. Nous revenons vers vous rapidement.";
+        el("sendBtn").disabled = true;
+        el("sendBtn").textContent = "Diagnostic envoy\u00e9";
+      } else { parMessagerie(); }
+    }).catch(function () {
+      if (fini) return;
+      fini = true; clearTimeout(secours); parMessagerie();
+    });
   });
 
   /* =======================================================================
@@ -1513,6 +1571,10 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     el("tacheNext").disabled = true;
     el("tacheNext").textContent = "Continuer";
     el("rythmeNext").disabled = true;
+    el("equipesNext").disabled = true;
+    el("pairSuite").hidden = true;
+    el("sendBtn").disabled = false;
+    el("sendBtn").textContent = "Recevoir ce diagnostic";
     el("donneesNext").disabled = true;
     el("contexteNext").disabled = true;
     el("fPrenom").value = ""; el("fMail").value = "";
