@@ -4,6 +4,57 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>html{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none !important}</style>
+  function render() {
+    R = compute();
+
+    countTo(el("costEur"), R.eurLo, 1250, "");
+    el("costScope").textContent = A.taches.length === 1
+      ? "sur cette tâche" : "sur ces " + A.taches.length + " tâches";
+    el("costCalc").textContent = "Jusqu\u2019à " + nf(R.eurHi) + " \u20ac, soit " +
+      nf(Math.round(R.hAn)) + " heures par an. Calcul fait sur vos réponses, à votre coût horaire.";
+
+    el("vTitle").innerHTML = R.v.title;
+    el("vText").textContent = R.v.text;
+
+    var ro = el("recoList");
+    ro.innerHTML = "";
+    buildRecos(R).forEach(function (r, i) {
+      var li = document.createElement("li");
+      li.className = "reco-item" + (i === 0 ? " first" : "");
+      var chaudTag = r.pre || r.g === "Cadrage" || r.g === "Formation" || r.g === "IA d\u2019entreprise" || r.g === "IA d'entreprise";
+      if (chaudTag) li.className += " amb";
+      li.innerHTML =
+        '<span class="reco-n" data-n="' + (i + 1) + '"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" ' +
+        'stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' +
+        I[FAM_ICO[r.g] || "doc"] + '</svg></span>' +
+        '<span><span class="reco-tag' + (chaudTag ? " pre" : "") + '">' + r.g + '</span>' +
+        '<span class="reco-t">' + r.t + '</span>' +
+        '<span class="meta">' +
+        (r.eur ? '<span class="gain">' + nf(r.eur) + " \u2192 " + nf(r.eurHi) + ' \u20ac / an</span>' : '') +
+        '<span class="effort ' + r.ef + '">' + EFFORT[r.ef] + '</span></span></span>';
+      ro.appendChild(li);
+    });
+
+    var notes = "";
+    if (A.dept.id === "oise") {
+      notes += '<div class="note fin"><h4>Financement, dans l\u2019Oise</h4>' +
+        "Diagnostic 600 \u20ac HT puis 70 % des dépenses pris en charge, plafond 3 000 \u20ac HT, " +
+        "pour les entreprises de l\u2019Oise de moins de 50 salariés et moins de 7 M\u20ac de chiffre d\u2019affaires." +
+        '<span class="small">Sous réserve d\u2019éligibilité et d\u2019acceptation.</span></div>';
+    } else {
+      notes += '<div class="note fin"><h4>Financement</h4>' +
+        "Des financements existent selon votre entreprise et la nature de l\u2019action." +
+        '<span class="small">Nous vérifions avant d\u2019annoncer.</span></div>';
+    }
+    el("extraNotes").innerHTML = notes;
+
+    el("ctaRdv").href = CONFIG.rdv;
+    el("ctaTop").href = CONFIG.rdv;
+    el("ctaDock").href = CONFIG.rdv;
+    setTimeout(function () { el("dock").classList.add("on"); }, 1600);
+    buildQR();
+  }
+
 <title>Diagnostic B&amp;L Connect</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">
 </head>
@@ -115,6 +166,10 @@ main{flex:1; display:flex; justify-content:center; padding:2rem 1.375rem 4rem}
 .opt.on .opt-num{color:var(--cyan)}
 
 /* ---------- chips ---------- */
+.rblock{background:#fff; border:1px solid var(--line); border-radius:18px; padding:1.125rem 1.25rem; margin-bottom:.75rem}
+.rblock h4{font-size:.9375rem; letter-spacing:-.018em; margin-bottom:.875rem; display:flex; gap:.625rem; align-items:center}
+.rblock h4 .n{flex:none; width:1.5rem; height:1.5rem; border-radius:8px; background:var(--cyan-050); color:var(--cyan); font-size:11px; font-weight:800; display:grid; place-items:center}
+.rblock .pair + .pair{margin-top:.875rem}
 .pair{display:flex; flex-direction:column; gap:.625rem}
 .pair-lab{font-size:11.5px; font-weight:600; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-muted)}
 .chips{display:flex; flex-wrap:wrap; gap:.5rem}
@@ -273,6 +328,12 @@ main{flex:1; display:flex; justify-content:center; padding:2rem 1.375rem 4rem}
 .bars i b{width:14px; height:5px; border-radius:3px; background:var(--line); display:block}
 .bars i b.on{background:var(--cyan)}
 .reco-item.amb .bars i b.on{background:var(--amber)}
+.gain{font-size:12.5px; font-weight:800; letter-spacing:-.015em; color:var(--cyan); font-variant-numeric:tabular-nums}
+.reco-item.amb .gain{color:#b0801f}
+.close #extraNotes{margin-top:.25rem}
+.close .note.fin{background:rgba(5,159,217,.14); border-color:rgba(70,189,236,.32); color:var(--on-dark)}
+.close .note.fin h4{color:var(--cyan-200)}
+.close .note .small{color:#8fa6bf}
 .effort{
   font-size:10px; font-weight:700; letter-spacing:.11em; text-transform:uppercase;
   border-radius:999px; padding:.25rem .625rem; background:var(--surface-soft);
@@ -445,18 +506,12 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       </section>
 
       <section class="screen" id="s-rythme" hidden>
-        <div class="head"><span class="eyebrow">Question 3</span>
-          <h2 class="q" id="rythmeQ">Elle revient combien de fois, et elle prend combien de temps&nbsp;?</h2>
+        <div class="head">
+          <span class="eyebrow">Question 3</span>
+          <h2 class="q">Pour chacune&nbsp;: <span class="hl">combien de fois</span>, et combien de temps&nbsp;?</h2>
         </div>
-        <p class="hint">Une estimation suffit.</p>
-        <div class="pair">
-          <span class="pair-lab">Au total, nombre de fois par semaine</span>
-          <div class="chips" id="chipsFreq"></div>
-        </div>
-        <div class="pair">
-          <span class="pair-lab">Temps moyen à chaque fois</span>
-          <div class="chips" id="chipsDuree"></div>
-        </div>
+        <p class="hint">Une estimation suffit. C’est ce chiffre qui sert de base au calcul.</p>
+        <div id="rythmeBlocs"></div>
         <div class="actions">
           <button class="cta" id="rythmeNext" disabled data-go="donnees">Continuer</button>
           <button class="back" data-back="tache">Revenir</button>
@@ -536,60 +591,31 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       </section>
 
       <section class="screen" id="s-result" hidden>
+
         <div class="panel shock">
           <div class="kicker">Votre diagnostic</div>
           <div class="hugewrap">
             <span class="hugenum" id="costEur">0</span>
-            <span class="hugeunit">euros par an au minimum<br>sur cette seule tâche</span>
+            <span class="hugeunit">euros par an<br><span id="costScope"></span></span>
           </div>
-          <div class="hugesub">jusqu’à <span id="costH"></span> heures de travail</div>
           <p class="hugenote" id="costCalc"></p>
-          <hr>
-          <span class="eyebrow" id="vEyebrow"></span>
-          <h2 id="vTitle" style="margin-top:.75rem"></h2>
-          <p class="vtext" id="vText"></p>
-          <a class="cta light" id="ctaTop" href="#" target="_blank" rel="noopener">Réserver un échange découverte</a>
+          <a class="cta light" id="ctaTop" href="#" target="_blank" rel="noopener">Réserver mon échange découverte</a>
           <div class="proof">
             <span><span class="stars">★★★★★</span> 5,0 sur Google, 7 avis</span>
-            <span>Des agents en service chez un éditeur de logiciel</span>
-            <span>Un interlocuteur unique</span>
+            <span>30 minutes, gratuit</span>
           </div>
         </div>
 
         <div class="card reco">
           <div class="reco-head">
-            <h3>Vos pistes, classées</h3>
-            <p>Par impact, puis par rapidité de mise en place.</p>
+            <h3 id="vTitle"></h3>
+            <p id="vText"></p>
           </div>
           <ol class="reco-list" id="recoList"></ol>
         </div>
 
-        <div class="card cond">
-          <div class="top">
-            <div class="gauge">
-              <svg width="104" height="104" viewBox="0 0 104 104" aria-hidden="true">
-                <circle class="track" cx="52" cy="52" r="44" fill="none" stroke-width="8"></circle>
-                <circle class="arc" id="gaugeArc" cx="52" cy="52" r="44" fill="none" stroke-width="8"
-                        stroke-dasharray="276.5" stroke-dashoffset="276.5"></circle>
-              </svg>
-              <div class="gauge-in">
-                <span class="gauge-num" id="gaugeNum">0</span>
-                <span class="gauge-den">sur 4</span>
-              </div>
-            </div>
-            <div>
-              <h3>Ce qui est déjà réuni chez vous</h3>
-              <ul class="cond-list" id="condList"></ul>
-            </div>
-          </div>
-        </div>
-
-        <div id="extraNotes"></div>
-
         <div class="panel close">
-          <span class="eyebrow">La suite</span>
-          <h2>On regarde ça ensemble, <span class="hl">30 minutes</span></h2>
-          <p class="hint">Vous repartez avec un premier périmètre chiffré.</p>
+          <h2>Deux façons de <span class="hl">continuer</span></h2>
           <a class="cta light" id="ctaRdv" href="#" target="_blank" rel="noopener">Réserver mon échange découverte</a>
           <div class="sep"></div>
           <div class="two">
@@ -598,11 +624,13 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
           </div>
           <button class="cta ghost" id="sendBtn">Recevoir ce diagnostic</button>
           <p class="hint tight" id="sendHint">Votre messagerie s’ouvre pré-remplie.</p>
+          <div id="extraNotes"></div>
           <div class="qr-box" id="qrBox">
             <div id="qrHolder"></div>
             <p class="hint tight">À scanner avec votre téléphone.</p>
           </div>
         </div>
+
         <button class="restart" id="restart">Recommencer le diagnostic</button>
       </section>
 
@@ -1079,15 +1107,30 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       el("tacheNext").disabled = A.taches.length === 0;
       el("tacheNext").textContent = A.taches.length
         ? "Continuer (" + A.taches.length + "/3)" : "Continuer";
-      el("rythmeQ").innerHTML = A.taches.length === 1
-        ? "«&nbsp;" + A.taches[0].label + "&nbsp;»<br>Combien de fois, et combien de temps&nbsp;?"
-        : "Ces " + A.taches.length + " tâches, au total&nbsp;: combien de fois, et combien de temps&nbsp;?";
+      buildRythme();
     }});
   }
 
-  buildChips(el("chipsFreq"),  FREQ,  function (it) { A.freq = it;  checkRythme(); });
-  buildChips(el("chipsDuree"), DUREE, function (it) { A.duree = it; checkRythme(); });
-  function checkRythme() { el("rythmeNext").disabled = !(A.freq && A.duree); }
+  function buildRythme() {
+    var box = el("rythmeBlocs");
+    box.innerHTML = "";
+    A.taches.forEach(function (t, k) {
+      var d = document.createElement("div");
+      d.className = "rblock";
+      d.innerHTML = '<h4><span class="n">' + (k + 1) + '</span>' + t.label + '</h4>' +
+        '<div class="pair"><span class="pair-lab">Fois par semaine</span><div class="chips"></div></div>' +
+        '<div class="pair"><span class="pair-lab">Temps à chaque fois</span><div class="chips"></div></div>';
+      var cs = d.querySelectorAll(".chips");
+      buildChips(cs[0], FREQ,  function (it) { t.freq = it;  checkRythme(); });
+      buildChips(cs[1], DUREE, function (it) { t.duree = it; checkRythme(); });
+      box.appendChild(d);
+    });
+    checkRythme();
+  }
+  function checkRythme() {
+    var ok = A.taches.length > 0 && A.taches.every(function (t) { return t.freq && t.duree; });
+    el("rythmeNext").disabled = !ok;
+  }
 
   buildOpts(el("optsDonnees"), DONNEES, { onPick: function (it, b) {
     var i = A.donnees.indexOf(it.id);
@@ -1149,14 +1192,24 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
   }
   function round100(n) { return Math.round(n / 100) * 100; }
 
+  function maxFreq() {
+    return Math.max.apply(null, A.taches.map(function (t) { return t.freq.v; }));
+  }
+
   function compute() {
-    var hSem = A.freq.v * A.duree.v / 60;
-    var hAn  = hSem * CONFIG.semaines;
+    var hAn = 0;
+    A.taches.forEach(function (t) {
+      t.hAn = t.freq.v * t.duree.v / 60 * CONFIG.semaines;
+      t.eurLo = round100(t.hAn * A.taux.lo);
+      t.eurHi = round100(t.hAn * A.taux.hi);
+      hAn += t.hAn;
+    });
+    var hSem = hAn / CONFIG.semaines;
     var num  = A.donnees.filter(function (id) {
       return DONNEES.some(function (d) { return d.id === id && d.num; });
     });
     var conds = [
-      { ok:A.freq.v >= 3,               txt:"Elle revient au moins trois fois par semaine" },
+      { ok:A.taches.some(function (t) { return t.freq.v >= 3; }), txt:"Au moins une revient trois fois par semaine ou plus" },
       { ok:num.length > 0,              txt:"L’information vit dans un outil, pas seulement dans les têtes" },
       { ok:A.etapes.id !== "rarement",  txt:"Les étapes sont stables d’une fois sur l’autre" },
       { ok:A.volume.v >= 2.5,           txt:"Plusieurs personnes sont concernées" }
@@ -1172,17 +1225,17 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
         title:"D’abord rendre cette information <span class=\"hl\">lisible</span>",
         text:"Un système ne lit que ce qui existe quelque part. Ni sur un drive, ni dans un logiciel aujourd’hui.",
         tag:"Première étape avant tout outil" };
-    } else if (num.length >= 3 || (A.volume.v >= 6 && num.length >= 2)) {
+    } else if (num.length >= 3 || (A.volume.v >= 6 && num.length >= 2) || (A.volume.v >= 4 && num.length >= 2 && A.taches.length >= 2)) {
       v = { key:"plateforme", eyebrow:"Ce qui est faisable chez vous",
         title:"Votre sujet, c’est <span class=\"hl\">l’éparpillement</span>",
         text:"Votre information vit à " + num.length + " endroits. Chaque tâche repaie le même coût de recherche.",
         tag:"Plateforme IA métier" };
-    } else if (fam === "Agent" && A.etapes.id === "toujours" && A.freq.v >= 6) {
+    } else if (fam === "Agent" && A.etapes.id === "toujours" && maxFreq() >= 6) {
       v = { key:"agent", eyebrow:"Ce qui est faisable chez vous",
         title:"Cette tâche peut tourner <span class=\"hl\">sans que vous la demandiez</span>",
         text:"Assez fréquente, toujours le même chemin, données déjà en place.",
         tag:"Agent IA sur mesure" };
-    } else if (fam === "Agent" && A.freq.v >= 6 && A.etapes.id !== "rarement") {
+    } else if (fam === "Agent" && maxFreq() >= 6 && A.etapes.id !== "rarement") {
       v = { key:"agent-cadre", eyebrow:"Ce qui est faisable chez vous",
         title:"Assez fréquente pour tourner seule, <span class=\"hl\">une fois le chemin fixé</span>",
         text:"Il reste des variantes. Les écrire est notre premier travail avec vous.",
@@ -1283,12 +1336,16 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
   function buildRecos(R) {
     var out = [], nSrc = R.num.length, v_key = R.v.key;
     var chaud = A.enjeu && (A.enjeu.id === "affaires" || A.enjeu.id === "risque");
-    A.taches.forEach(function (t, k) {
+    if (A.volume.v <= 1) {
+      out.push({ imp:2, ef:"rapide", t:"Un accès professionnel à l'IA, sur vos outils",
+        w:"", g:"IA d'entreprise" });
+    }
+    A.taches.forEach(function (t) {
       var sol  = SOLUTION[t.type] || SOLUTION.entrant;
       var base = RECO_TACHE[t.type] || RECO_TACHE.entrant;
-      out.push({ p:100 - k, imp:(k === 0 || chaud ? 3 : 2),
+      out.push({ eur:t.eurLo, eurHi:t.eurHi, imp:(chaud ? 3 : 2),
         ef:(base.g === "Agent" ? "moyen" : "rapide"),
-        t:sol.t, w:sol.d, g:base.g });
+        t:sol.t, g:base.g });
     });
 
     if (nSrc === 0) {
@@ -1306,13 +1363,20 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       out.push({ p:70, imp:2, ef:"moyen", t:"Une file d'entrée qualifiée",
         w:"Chaque demande arrive avec son objet, son urgence et son dossier. Vous ouvrez votre journée sur une liste déjà triée.", g:"Agent" });
     }
-    if (A.equipes.id === "sansregle" || A.equipes.id === "inconnu") {
-      out.push({ p:80, imp:2, ef:"rapide", t:"Une charte d'usage de l'IA, écrite avec vos équipes",
+    var seul = A.volume.v <= 1, equipe = A.volume.v >= 4;
+
+    if (equipe) {
+      out.push({ imp:3, ef:"moyen", t:"Une seule façon de faire, la même pour tous",
+        w:"", g:"Plateforme" });
+    }
+
+    if (!seul && (A.equipes.id === "sansregle" || A.equipes.id === "inconnu")) {
+      out.push({ p:80, imp:(equipe ? 3 : 2), ef:"rapide", t:"Une charte d'usage de l'IA, écrite avec vos équipes",
         w:"Une demi-journée : ce qui peut entrer dans un outil d'IA, ce qui n'y entre jamais, et le document que tout le monde signe.", g:"Formation" });
-      out.push({ p:78, imp:2, ef:"rapide", t:"Une IA d'entreprise dans " + A.suite.nom,
+      out.push({ p:78, imp:(equipe ? 3 : 2), ef:"rapide", t:"Une IA d'entreprise dans " + A.suite.nom,
         w:"Un accès d'entreprise pour l'équipe, branché sur vos outils, plus les trois cas d'usage qui servent tous les jours. Les échanges restent dans votre périmètre.",
         g:"IA d'entreprise" });
-    } else if (A.equipes.id === "regle" || A.equipes.id === "non") {
+    } else if (!seul) {
       out.push({ p:35, imp:2, ef:"rapide", t:"Une IA d'entreprise dans " + A.suite.nom,
         w:"Un accès commun sur vos outils actuels, et les cas d'usage installés avec l'équipe, plutôt que des abonnements dispersés que personne n'utilise.",
         g:"IA d'entreprise" });
@@ -1326,6 +1390,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     if (v_key === "amont") out = out.filter(function (o) { return o.t.indexOf("Poser l'information") !== 0; });
     var rang = { rapide:0, moyen:1, long:2 };
     out.sort(function (a, b) {
+      if ((b.eur || 0) !== (a.eur || 0)) return (b.eur || 0) - (a.eur || 0);
       if (b.imp !== a.imp) return b.imp - a.imp;
       return rang[a.ef] - rang[b.ef];
     });
@@ -1417,7 +1482,10 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     L.push("");
     L.push("Activité : " + A.metier.label);
     L.push("Tâches : " + A.taches.map(function (t) { return t.label; }).join(" | "));
-    L.push("Fréquence : " + A.freq.label + " fois par semaine, " + A.duree.label + " à chaque fois");
+    A.taches.forEach(function (t) {
+      L.push("  - " + t.label + " : " + t.freq.label + " fois/semaine, " + t.duree.label +
+             " -> " + nf(Math.round(t.hAn)) + " h/an, " + nf(t.eurLo) + " a " + nf(t.eurHi) + " EUR/an");
+    });
     L.push("Information : " + A.donnees.map(function (id) {
       return DONNEES.filter(function (d) { return d.id === id; })[0].label.toLowerCase();
     }).join(", "));
