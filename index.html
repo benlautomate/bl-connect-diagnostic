@@ -1551,7 +1551,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
         (i === 0 && r.w ? '<span class="reco-w">' + r.w + '</span>' : '') +
         '<span class="meta">' +
         (r.eur ? '<span class="gain' + (R.v.key === "amont" ? " cond" : "") + '">' +
-          '<em>vous coûte aujourd\u2019hui</em>' + nf(r.eur) + ' \u20ac / an' +
+          '<em>pourrait vous faire récupérer</em>jusqu\u2019à ' + nf(r.eur) + ' \u20ac / an' +
           (R.v.key === "amont" ? '<em class="low">une fois l\u2019information atteignable</em>' : '') + '</span>' : '') +
         '<span class="effort ' + r.ef + '">' + EFFORT[r.ef] + '</span></span>' +
         (r.eur ? '<span class="poids"><span data-w="' + Math.round(r.eur / maxEur * 100) + '"></span></span>' : '') +
