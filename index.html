@@ -1505,7 +1505,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     }
     var chiffrees  = out.filter(function (o) { return o.eur; }).sort(classe);
     var transverse = out.filter(function (o) { return !o.eur; }).sort(classe);
-    return chiffrees.slice(0, 3).concat(transverse.slice(0, 2)).slice(0, 5);
+    return chiffrees.slice(0, 2).concat(transverse.slice(0, 1)).slice(0, 3);
   }
   var R = null;
 
