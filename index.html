@@ -649,7 +649,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
             <input type="text" name="metier"><input type="text" name="montant">
             <input type="text" name="societe"><textarea name="diagnostic"></textarea>
           </form>
-          <p class="hint tight" id="sendHint">Vous recevez le détail par mail, et nous savons vous recontacter.</p>
+          <p class="hint tight" id="sendHint">Vous recevez votre diagnostic complet, avec le détail tâche par tâche.</p>
           <div id="extraNotes"></div>
             <p class="hint tight">À scanner avec votre téléphone.</p>
           </div>
@@ -1670,7 +1670,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       if (fini) return;
       fini = true; clearTimeout(secours);
       if (r.ok) {
-        hint.textContent = "C\u2019est parti. Vous recevez le détail, nous revenons vers vous rapidement.";
+        hint.textContent = "C\u2019est parti. Votre diagnostic complet arrive dans votre bo\u00eete.";
         el("sendBtn").disabled = true;
         el("sendBtn").textContent = "Diagnostic envoy\u00e9";
       } else { parMessagerie(); }
