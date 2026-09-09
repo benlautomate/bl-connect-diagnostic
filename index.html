@@ -332,7 +332,9 @@ main{flex:1; display:flex; justify-content:center; padding:2rem 1.375rem 4rem}
 .bars i b.on{background:var(--cyan)}
 .reco-item.amb .bars i b.on{background:var(--amber)}
 .gain.cond{color:var(--ink-muted)}
-.gain em{display:block; font-style:normal; font-size:10.5px; font-weight:600; letter-spacing:.02em; color:var(--ink-dim); margin-top:.125rem}
+.gain{display:flex; flex-direction:column; gap:.0625rem}
+.gain em{display:block; font-style:normal; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-dim); margin:0}
+.gain em.low{text-transform:none; letter-spacing:.02em; font-weight:600; margin-top:.125rem}
 .gain{font-size:12.5px; font-weight:800; letter-spacing:-.015em; color:var(--cyan); font-variant-numeric:tabular-nums}
 .reco-item.amb .gain{color:#b0801f}
 .close #extraNotes{margin-top:.25rem}
@@ -350,6 +352,8 @@ main{flex:1; display:flex; justify-content:center; padding:2rem 1.375rem 4rem}
 .reco-w{font-size:.875rem; color:var(--ink-muted); line-height:1.5; margin-top:.375rem; display:block}
 .reco-item{padding:1rem 1.5rem}
 .meta{margin-top:.5rem}
+
+.reco-foot{padding:1rem 1.5rem 1.25rem; font-size:12.5px; color:var(--ink-muted); line-height:1.55; border-top:1px solid var(--line-soft); margin:0}
 
 /* ---------- notes ---------- */
 .note{border-radius:18px; padding:1.1875rem 1.25rem; font-size:.9063rem; line-height:1.6; color:var(--ink-soft); border:1px solid var(--line); background:var(--surface-soft); margin-bottom:.875rem}
@@ -374,10 +378,12 @@ main{flex:1; display:flex; justify-content:center; padding:2rem 1.375rem 4rem}
 .field input::placeholder{color:var(--ink-dim)}
 .field input:focus{outline:none; border-color:var(--cyan); background:#fff; box-shadow:0 0 0 3px rgba(5,159,217,.14)}
 .two{display:grid; grid-template-columns:1fr 1fr; gap:.75rem}
+.field input{min-width:0; width:100%}
+@media (max-width:430px){.two{grid-template-columns:1fr}}
 
 .qr-box{display:none; gap:1.125rem; align-items:center; padding-top:.25rem}
 .qr-box .qr-frame{position:relative; background:#fff; border:1px solid var(--line); padding:9px; border-radius:14px; line-height:0; flex:none; box-shadow:0 8px 24px -12px rgba(1,23,52,.4)}
-.qr-badge{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:30px; height:30px; border-radius:50%; border:2.5px solid #fff; object-fit:cover; display:block}
+.qr-badge{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:34px; height:34px; border-radius:50%; box-shadow:0 0 0 4px #fff; object-fit:cover; display:block}
 .qr-box .hint{font-size:.8125rem}
 @media (min-width:600px){.qr-box.ready{display:flex}}
 
@@ -479,7 +485,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
         <div class="panel">
           <span class="eyebrow">2 minutes, sans inscription</span>
           <h1>Quelle tâche revient chez vous chaque semaine, et <span class="hl">combien vous coûte-t-elle</span>&nbsp;?</h1>
-          <p class="lede">Huit questions. Un chiffre, et ce qui est faisable chez vous.</p>
+          <p class="lede">Neuf questions. Un chiffre, et ce qui est faisable chez vous.</p>
           <div class="facts">
             <span>Oise et Val-d’Oise en présentiel</span>
             <span>France entière à distance</span>
@@ -496,6 +502,13 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
         </div>
         <p class="hint">Pour vous montrer des exemples qui vous parlent.</p>
         <div class="opts" id="optsMetier"></div>
+        <div class="field" id="autreWrap" hidden>
+          <label for="fAutre">Votre activité, en un mot</label>
+          <input id="fAutre" type="text" maxlength="40" placeholder="ex : sécurité, événementiel, santé">
+        </div>
+        <div class="actions" id="autreActions" hidden>
+          <button class="cta" id="autreNext" data-go="tache">Continuer</button>
+        </div>
       </section>
 
       <section class="screen" id="s-tache" hidden>
@@ -503,7 +516,6 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
           <h2 class="q">Lesquelles vous prennent <span class="hl">le plus de temps</span>&nbsp;?</h2>
         </div>
         <p class="hint">Jusqu’à trois. Celles qui reviennent sans cesse, ou celles qui sont longues à démêler.</p>
-        <p class="legend"><span class="d cy"></span>préparé à votre demande <span class="d am"></span>traité en continu, sans vous</p>
         <div class="opts" id="optsTache"></div>
         <div class="actions">
           <button class="cta" id="tacheNext" disabled data-go="rythme">Continuer</button>
@@ -514,7 +526,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       <section class="screen" id="s-rythme" hidden>
         <div class="head">
           <span class="eyebrow">Question 3</span>
-          <h2 class="q">Pour chacune&nbsp;: <span class="hl">combien de fois</span>, et combien de temps&nbsp;?</h2>
+          <h2 class="q">Pour chacune&nbsp;: <span class="hl">combien de fois par semaine</span>, et combien de temps à chaque fois&nbsp;?</h2>
         </div>
         <p class="hint">Une estimation suffit. C’est ce chiffre qui sert de base au calcul.</p>
         <div id="rythmeBlocs"></div>
@@ -589,10 +601,10 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
           <div class="chips" id="chipsTaux"></div>
         </div>
         <div class="pair">
-          <span class="pair-lab">Où êtes-vous&nbsp;?</span>
+          <span class="pair-lab">Où êtes-vous situé&nbsp;?</span>
           <div class="chips" id="chipsDept"></div>
         </div>
-        <p class="hint">Pour chiffrer, et pour vérifier les financements près de chez vous.</p>
+        <p class="hint">Le coût horaire sert au calcul. La localisation nous dit quelles aides existent chez vous, et si nous pouvons venir sur place ou si ce sera en visio.</p>
         <div class="actions">
           <button class="cta" id="contexteNext" disabled>Voir mon diagnostic</button>
           <button class="back" data-back="equipes">Revenir</button>
@@ -605,7 +617,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
           <div class="kicker">Votre diagnostic</div>
           <div class="hugewrap">
             <span class="hugenum" id="costEur">0</span>
-            <span class="hugeunit">euros par an<br><span id="costScope"></span></span>
+            <span class="hugeunit">euros par an<br>que ces tâches <b>vous coûtent</b></span>
           </div>
           <p class="hugenote" id="costCalc"></p>
           <a class="cta light" id="ctaTop" href="#" target="_blank" rel="noopener">Réserver mon échange découverte</a>
@@ -621,6 +633,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
             <p id="vText"></p>
           </div>
           <ol class="reco-list" id="recoList"></ol>
+          <p class="reco-foot">Les montants indiqués sont ce que ces tâches vous coûtent chaque année en temps de travail. Le prix de la solution se chiffre séparément, périmètre par périmètre.</p>
         </div>
 
         <div class="panel close">
@@ -637,7 +650,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
             <input type="text" name="metier"><input type="text" name="montant">
             <input type="text" name="societe"><textarea name="diagnostic"></textarea>
           </form>
-          <p class="hint tight" id="sendHint">Votre messagerie s’ouvre pré-remplie.</p>
+          <p class="hint tight" id="sendHint">Vous recevez le détail par mail, et nous savons vous recontacter.</p>
           <div id="extraNotes"></div>
           <div class="qr-box" id="qrBox">
             <div id="qrHolder"></div>
@@ -687,14 +700,16 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
      ======================================================================= */
   var SENSIBLE = ["compta", "juridique", "courtage", "formation"];
   var METIERS = [
-    { id:"compta",    label:"Cabinet comptable ou expertise", icon:"compta" },
-    { id:"juridique", label:"Cabinet juridique ou conseil", icon:"juridique" },
-    { id:"etudes",    label:"Bureau d’études, ingénierie", icon:"etudes" },
-    { id:"courtage",  label:"Courtage, assurance, financement", icon:"courtage" },
-    { id:"formation", label:"Organisme de formation", icon:"formation" },
-    { id:"technique", label:"Services techniques, maintenance", icon:"technique" },
-    { id:"batiment",  label:"Bâtiment, travaux, artisanat", icon:"batiment" },
-    { id:"autre",     label:"Autre activité de services", icon:"autre" }
+    { id:"compta",    label:"Cabinet comptable &amp; paie",              note:"Expertise-comptable, tenue, social", icon:"compta" },
+    { id:"juridique", label:"Cabinet juridique, conseil &amp; audit",    note:"Avocats, notaires, conseil", icon:"juridique" },
+    { id:"etudes",    label:"Bureau d’études, ingénierie &amp; architecture", note:"BE, maîtrise d’œuvre, archi", icon:"etudes" },
+    { id:"courtage",  label:"Banque, assurance, courtage &amp; immobilier", note:"Courtage, gestion, syndic", icon:"courtage" },
+    { id:"industrie", label:"Industrie, négoce &amp; distribution",      note:"Prospection, devis, ADV, SAV", icon:"industrie" },
+    { id:"transport", label:"Transport, logistique &amp; supply chain",  note:"Affrètement, entrepôt, flotte", icon:"transport" },
+    { id:"digital",   label:"Agence &amp; prestataires digitaux",        note:"Com, marketing, web, IT, ESN", icon:"digital" },
+    { id:"formation", label:"Formation, RH &amp; recrutement",           note:"Organismes de formation, cabinets RH", icon:"formation" },
+    { id:"batiment",  label:"Bâtiment, travaux &amp; maintenance",       note:"Artisanat, services techniques", icon:"batiment" },
+    { id:"autre",     label:"Autre activité",                            note:"Précisez en un mot", icon:"autre" }
   ];
 
   var TACHES = {
@@ -763,19 +778,6 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       { t:"analyse",     label:"Éplucher de gros documents pour en sortir l’essentiel" },
       { t:"synthese",    label:"Recouper de la matière éparpillée sur un sujet" }
     ],
-    technique: [
-      { t:"planif",    label:"Planifier les interventions" },
-      { t:"doc",       label:"Produire les rapports d’intervention" },
-      { t:"relance",   label:"Relancer les devis sans réponse" },
-      { t:"entrant",   label:"Traiter les demandes entrantes" },
-      { t:"pieces",    label:"Réclamer les éléments manquants avant intervention" },
-      { t:"saisie",    label:"Ressaisir les rapports terrain dans l’outil" },
-      { t:"facture",   label:"Facturer les interventions et relancer" },
-      { t:"contenu",     label:"Alimenter votre communication" },
-      { t:"acquisition", label:"Aller chercher de nouveaux clients" },
-      { t:"analyse",     label:"Éplucher de gros documents pour en sortir l’essentiel" },
-      { t:"synthese",    label:"Recouper de la matière éparpillée sur un sujet" }
-    ],
     batiment: [
       { t:"doc",       label:"Chiffrer les devis" },
       { t:"relance",   label:"Relancer les devis sans réponse" },
@@ -788,6 +790,45 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       { t:"acquisition", label:"Aller chercher de nouveaux clients" },
       { t:"analyse",     label:"Éplucher de gros documents pour en sortir l’essentiel" },
       { t:"synthese",    label:"Recouper de la matière éparpillée sur un sujet" }
+    ],
+    industrie: [
+      { t:"doc",         label:"Établir des devis qui se ressemblent" },
+      { t:"relance",     label:"Relancer les devis sans réponse" },
+      { t:"entrant",     label:"Traiter les commandes et demandes entrantes" },
+      { t:"saisie",      label:"Ressaisir les commandes dans l’ERP" },
+      { t:"pieces",      label:"Réclamer les éléments manquants d’une commande" },
+      { t:"facture",     label:"Facturer et suivre les impayés" },
+      { t:"controle",    label:"Vérifier une commande avant expédition" },
+      { t:"reporting",   label:"Produire le suivi commercial et les stocks" },
+      { t:"acquisition", label:"Aller chercher de nouveaux clients" },
+      { t:"analyse",     label:"Éplucher un appel d’offres ou un cahier des charges" },
+      { t:"synthese",    label:"Recouper les retours du SAV et des clients" }
+    ],
+    transport: [
+      { t:"planif",      label:"Planifier les tournées et les affrètements" },
+      { t:"entrant",     label:"Traiter les demandes de transport entrantes" },
+      { t:"doc",         label:"Produire les documents de transport" },
+      { t:"saisie",      label:"Ressaisir les bons et les lettres de voiture" },
+      { t:"controle",    label:"Vérifier la conformité avant départ" },
+      { t:"facture",     label:"Facturer et suivre les litiges" },
+      { t:"relance",     label:"Relancer les devis et les cotations" },
+      { t:"reporting",   label:"Produire le suivi de flotte et de coûts" },
+      { t:"contenu",     label:"Alimenter votre communication" },
+      { t:"analyse",     label:"Éplucher un appel d’offres logistique" },
+      { t:"synthese",    label:"Recouper les incidents et les retards" }
+    ],
+    digital: [
+      { t:"doc",         label:"Rédiger des propositions commerciales" },
+      { t:"relance",     label:"Relancer les devis sans réponse" },
+      { t:"contenu",     label:"Produire du contenu pour vous ou vos clients" },
+      { t:"doc2",        label:"Produire les comptes rendus de projet" },
+      { t:"entrant",     label:"Traiter les demandes et les tickets" },
+      { t:"reporting",   label:"Produire les rapports de performance clients" },
+      { t:"facture",     label:"Facturer et suivre les règlements" },
+      { t:"acquisition", label:"Aller chercher de nouveaux clients" },
+      { t:"pieces",      label:"Réclamer les éléments aux clients" },
+      { t:"analyse",     label:"Éplucher un cahier des charges" },
+      { t:"synthese",    label:"Recouper la matière d’un projet ou d’un audit" }
     ],
     autre: [
       { t:"entrant",   label:"Traiter les demandes entrantes" },
@@ -1052,6 +1093,9 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     doc2:'<path d="M4 4.6h12M4 8.2h12M4 11.8h8M4 15.4h8"/>',
     recherche:'<circle cx="8.8" cy="8.8" r="5.2"/><path d="m12.8 12.8 4 4"/>',
     entrant:'<path d="M2.6 11.4h4l1.2 2h4.4l1.2-2h4"/><path d="M4.6 4.6h10.8l2 6.8v4.2a1.4 1.4 0 0 1-1.4 1.4H4a1.4 1.4 0 0 1-1.4-1.4v-4.2z"/>',
+    industrie:'<path d="M2.8 17.2V8.6l4.6 2.8V8.6l4.6 2.8V4.4h4.6v12.8z"/><path d="M2.8 17.2h14.4"/>',
+    transport:'<path d="M1.8 13.6V6.4h9.6v7.2M11.4 8.8h3.2l2.6 2.8v2h-5.8"/><circle cx="5.4" cy="14.8" r="1.6"/><circle cx="13.6" cy="14.8" r="1.6"/>',
+    digital:'<rect x="2.4" y="4" width="15.2" height="10" rx="1.8"/><path d="M7 17.2h6M10 14v3.2M6.6 7.4 5 9l1.6 1.6M13.4 7.4 15 9l-1.6 1.6"/>',
     saisie:'<path d="M10 2.8v8.6M6.8 8.4 10 11.6l3.2-3.2"/><path d="M3.4 13.2v2.4a1.6 1.6 0 0 0 1.6 1.6h10a1.6 1.6 0 0 0 1.6-1.6v-2.4"/>',
     facture:'<path d="M5 2.6h10v14.8l-2.5-1.6-2.5 1.6-2.5-1.6L5 17.4z"/><path d="M8 7.4h4M8 10.6h4"/>',
     fixe:'<path d="M3.4 10h13.2"/><circle cx="6.6" cy="10" r="1.6"/><circle cx="13.4" cy="10" r="1.6"/>',
@@ -1132,7 +1176,11 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
   buildOpts(el("optsMetier"), METIERS, { round:true, onPick: function (it, b, c) {
     A.metier = it; single(c, b);
     buildTaches();
-    setTimeout(function () { show("tache"); }, 120);
+    var libre = (it.id === "autre");
+    el("autreWrap").hidden = !libre;
+    el("autreActions").hidden = !libre;
+    if (libre) { el("fAutre").focus(); return; }
+    setTimeout(function () { show("tache"); }, 160);
   }});
 
   function buildTaches() {
@@ -1161,8 +1209,8 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       var d = document.createElement("div");
       d.className = "rblock";
       d.innerHTML = '<h4><span class="n">' + (k + 1) + '</span>' + t.label + '</h4>' +
-        '<div class="pair"><span class="pair-lab">Fois par semaine</span><div class="chips"></div></div>' +
-        '<div class="pair"><span class="pair-lab">Temps à chaque fois</span><div class="chips"></div></div>';
+        '<div class="pair"><span class="pair-lab">Nombre de fois par semaine</span><div class="chips"></div></div>' +
+        '<div class="pair"><span class="pair-lab">Durée d’une seule fois</span><div class="chips"></div></div>';
       var cs = d.querySelectorAll(".chips");
       buildChips(cs[0], FREQ,  function (it) { t.freq = it;  checkRythme(); });
       buildChips(cs[1], DUREE, function (it) { t.duree = it; checkRythme(); });
@@ -1463,10 +1511,9 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     R = compute();
 
     countTo(el("costEur"), R.eurLo, 1250, "");
-    el("costScope").textContent = A.taches.length === 1
-      ? "sur cette tâche" : "sur ces " + A.taches.length + " tâches";
-    el("costCalc").textContent = "Jusqu\u2019à " + nf(R.eurHi) + " \u20ac, soit " +
-      nf(Math.round(R.hAn)) + " heures par an. Calcul fait sur vos réponses, à votre coût horaire.";
+    el("costCalc").textContent = nf(Math.round(R.hAn)) + " heures par an passées sur " +
+      (A.taches.length === 1 ? "cette tâche" : "ces " + A.taches.length + " tâches") +
+      ", au coût horaire que vous avez indiqué. Ce n\u2019est pas un prix : c\u2019est ce que ça vous coûte aujourd\u2019hui.";
 
     el("vTitle").innerHTML = R.v.title;
     el("vText").textContent = R.v.text;
@@ -1489,8 +1536,8 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
         (i === 0 && r.w ? '<span class="reco-w">' + r.w + '</span>' : '') +
         '<span class="meta">' +
         (r.eur ? '<span class="gain' + (R.v.key === "amont" ? " cond" : "") + '">' +
-          nf(r.eur) + " \u2192 " + nf(r.eurHi) + ' \u20ac / an' +
-          (R.v.key === "amont" ? '<em>une fois l\u2019information atteignable</em>' : '') + '</span>' : '') +
+          '<em>vous coûte aujourd\u2019hui</em>' + nf(r.eur) + ' \u20ac / an' +
+          (R.v.key === "amont" ? '<em class="low">une fois l\u2019information atteignable</em>' : '') + '</span>' : '') +
         '<span class="effort ' + r.ef + '">' + EFFORT[r.ef] + '</span></span>' +
         (r.eur ? '<span class="poids"><span data-w="' + Math.round(r.eur / maxEur * 100) + '"></span></span>' : '') +
         '</span>';
@@ -1502,11 +1549,11 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       notes += '<div class="note fin"><h4>Financement, dans l\u2019Oise</h4>' +
         "Diagnostic 600 \u20ac HT puis 70 % des dépenses pris en charge, plafond 3 000 \u20ac HT, " +
         "pour les entreprises de l\u2019Oise de moins de 50 salariés et moins de 7 M\u20ac de chiffre d\u2019affaires." +
-        '<span class="small">Sous réserve d\u2019éligibilité et d\u2019acceptation.</span></div>';
+        '<span class="small">Nous regardons ensemble si vous y avez droit avant de vous avancer un montant.</span></div>';
     } else {
       notes += '<div class="note fin"><h4>Financement</h4>' +
-        "Des financements existent selon votre entreprise et la nature de l\u2019action." +
-        '<span class="small">Nous vérifions avant d\u2019annoncer.</span></div>';
+        "Des aides existent selon votre département, votre activité et la nature de l\u2019action." +
+        '<span class="small">Nous regardons ensemble ce qui s\u2019applique chez vous avant de vous avancer un montant.</span></div>';
     }
     el("extraNotes").innerHTML = notes;
 
@@ -1530,7 +1577,9 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     var L = [];
     L.push("DIAGNOSTIC B&L CONNECT");
     L.push("");
-    L.push("Activité : " + A.metier.label);
+    var act = A.metier.label.replace(/&amp;/g, "&");
+    if (A.metier.id === "autre" && el("fAutre").value.trim()) act += " (" + el("fAutre").value.trim() + ")";
+    L.push("Activité : " + act);
     L.push("Tâches : " + A.taches.map(function (t) { return t.label; }).join(" | "));
     A.taches.forEach(function (t) {
       L.push("  - " + t.label + " : " + t.freq.label + " fois/semaine, " + t.duree.label +
@@ -1574,7 +1623,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     var m = el("fMail").value.trim();
     var hint = el("sendHint");
     if (!p || !m || m.indexOf("@") < 1) {
-      hint.textContent = "Renseignez votre prénom et votre email.";
+      hint.textContent = "Il manque votre prénom ou votre email.";
       hint.style.color = "var(--amber)";
       return;
     }
@@ -1585,6 +1634,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
                "\n\n" + p + "\n" + m + "\n";
 
     function parMessagerie() {
+      hint.textContent = "Votre messagerie s’ouvre avec le diagnostic. Envoyez le message pour que nous le recevions.";
       window.location.href = "mailto:" + encodeURIComponent(CONFIG.email) +
         "?cc=" + encodeURIComponent(m) +
         "&subject=" + encodeURIComponent("Diagnostic B&L Connect - " + p) +
@@ -1613,7 +1663,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       if (fini) return;
       fini = true; clearTimeout(secours);
       if (r.ok) {
-        hint.textContent = "C\u2019est envoy\u00e9. Nous revenons vers vous rapidement.";
+        hint.textContent = "C\u2019est parti. Vous recevez le détail, nous revenons vers vous rapidement.";
         el("sendBtn").disabled = true;
         el("sendBtn").textContent = "Diagnostic envoy\u00e9";
       } else { parMessagerie(); }
@@ -1629,14 +1679,14 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
   function buildQR() {
     if (typeof qrcode !== "function") return;
     try {
-      var q = qrcode(0, "M");
+      var q = qrcode(0, "H");
       q.addData(CONFIG.landing);
       q.make();
       var badge = document.querySelector(".mark img");
-      el("qrHolder").innerHTML = '<span class="qr-frame">' + q.createSvgTag({ cellSize:4, margin:0, scalable:true }) +
+      el("qrHolder").innerHTML = '<span class="qr-frame">' + q.createSvgTag({ cellSize:5, margin:1, scalable:true }) +
         (badge ? '<img class="qr-badge" src="' + badge.src + '" alt="">' : '') + '</span>';
       var svg = el("qrHolder").querySelector("svg");
-      if (svg) { svg.setAttribute("width", "104"); svg.setAttribute("height", "104"); }
+      if (svg) { svg.setAttribute("width", "116"); svg.setAttribute("height", "116"); svg.style.display = "block"; }
       el("qrBox").classList.add("ready");
     } catch (err) { /* le QR est un bonus, jamais un blocage */ }
   }
