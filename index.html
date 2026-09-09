@@ -754,14 +754,12 @@ body.avec-dock{padding-bottom:5.75rem}
     rdv:    "https://calendly.com/benjcailhol/rdv-decouverte",  // echange decouverte, 30 min
     email:  "benjamin@bl-connect.fr",                   // destinataire du diagnostic
     semaines: 46,                                       // semaines travaillées par an
-    // Adresse complète de la fonction qui envoie les deux mails (le rapport au
-    // prospect, la fiche à Benjamin). GitHub Pages n’exécute aucun code : la
-    // fonction doit être hébergée ailleurs (Netlify, Cloudflare, Vercel) et son
-    // adresse collée ici, par exemple
-    // "https://mon-site.netlify.app/.netlify/functions/diagnostic".
-    // Laissée vide, la page ouvre la messagerie du visiteur avec son diagnostic
-    // préparé : rien ne se perd, mais c’est lui qui appuie sur Envoyer.
-    depot:  ""
+    // Script qui envoie les deux mails (le rapport au visiteur, la fiche à
+    // Benjamin). Il vit à côté de cette page, sur un hébergement qui exécute PHP.
+    // Sur un hébergement sans PHP (GitHub Pages par exemple), le mettre à "" :
+    // la page ouvre alors la messagerie du visiteur avec son diagnostic préparé,
+    // rien ne se perd, mais c’est lui qui appuie sur Envoyer.
+    depot:  "diagnostic.php"
   };
 
   /* =======================================================================

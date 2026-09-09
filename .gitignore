@@ -1,2 +1,8 @@
 node_modules/
 .netlify/
+
+# Le mot de passe de la boite mail vit ici : il ne doit jamais partir sur GitHub.
+config.php
+
+# Journal des ecrans atteints, ecrit par le serveur.
+mesures.php

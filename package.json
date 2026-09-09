@@ -1,9 +1,0 @@
-{
-  "name": "bl-connect-diagnostic",
-  "version": "1.0.0",
-  "private": true,
-  "description": "Diagnostic B&L Connect : page unique et fonction d'envoi des rapports",
-  "dependencies": {
-    "nodemailer": "^6.9.16"
-  }
-}

@@ -1,28 +1,96 @@
 # Diagnostic B&L Connect
 
-Questionnaire de 9 questions qui chiffre le coût annuel d'une tâche récurrente et propose
-des solutions concrètes. Utilisé comme lead magnet en prospection.
+Questionnaire de 9 questions qui chiffre le coût annuel de tâches récurrentes et propose
+trois pistes concrètes. Utilisé comme lead magnet en prospection.
 
-Une page, aucune dépendance à installer. `index.html` se suffit à lui-même.
+La page, `index.html`, se suffit à elle-même : aucune bibliothèque, aucune installation.
+`diagnostic.php` s'occupe des envois quand l'hébergement exécute PHP.
 
-## Déploiement
+## Mise en ligne sur l'hébergement IONOS
 
-GitHub Pages sert le dépôt : chaque push sur `main` met le site à jour, à l'adresse
-https://benlautomate.github.io/bl-connect-diagnostic/ tant qu'aucun domaine propre
-n'est branché.
+Déposer par FTP, dans un sous-dossier du site (`/diagnostic/` par exemple) :
 
-**Le site vit dans un sous-dossier.** Toute adresse écrite en dur doit donc être soit
-relative sans barre oblique (`favicon.png`), soit absolue (`og:image`, `og:url`). Un
-chemin comme `/partage.png` serait résolu à la racine de `github.io` et renverrait une
-erreur. En cas de changement de domaine, ce sont ces deux balises du `<head>` à reprendre.
+    index.html          la page
+    diagnostic.php      envoie les deux mails
+    verification.php    page de contrôle, à supprimer après usage
+    config.php          vos réglages, à créer depuis config.exemple.php
+    web.config          réglages IIS (dossier par défaut, fichiers protégés)
+    favicon.png         icône de l'onglet
+    partage.png         image des liens partagés
+    lib/                PHPMailer, trois fichiers
 
-**GitHub Pages n'exécute aucun code.** La fonction d'envoi (`netlify/functions/`) ne peut
-donc pas y tourner : voir la section suivante.
+Ensuite :
+
+1. Copier `config.exemple.php` en `config.php` et y coller le mot de passe d'appareil
+   Infomaniak, ainsi que l'adresse publique du diagnostic.
+2. Ouvrir `verification.php` dans le navigateur. La page dit ce qui manque, teste la
+   connexion à la boîte mail et envoie un message d'essai.
+3. Une fois tout au vert, **supprimer `verification.php` du serveur**.
+4. Reprendre `og:image` et `og:url` dans le `<head>` de `index.html` avec l'adresse
+   définitive, sans quoi les liens partagés n'afficheront pas d'aperçu.
+
+`config.php` porte le mot de passe de la boîte : il est dans `.gitignore` et ne doit
+jamais partir sur GitHub. Le dépôt est public.
+
+Si le diagnostic reste aussi servi par GitHub Pages, penser à y couper la publication :
+deux versions en ligne, dont une sans PHP, finissent par diverger.
+
+## Ce qui se règle dans config.php
+
+| Constante | Rôle |
+|---|---|
+| `BL_MAIL` | boîte qui envoie et qui reçoit les diagnostics |
+| `BL_MDP` | mot de passe **d'appareil** Infomaniak, ni celui du compte, ni un mot de passe d'application |
+| `BL_SMTP_HOTE`, `BL_SMTP_PORT` | `mail.infomaniak.com`, 587 en STARTTLS (465 en SSL si le 587 est bloqué) |
+| `BL_SITE` | adresse publique du diagnostic, base du lien de reprise |
+| `BL_RDV` | lien de prise de rendez-vous |
+| `BL_EXPEDITEUR` | nom affiché comme expéditeur du rapport |
+
+Le reste se règle en haut du script de `index.html`, dans `var CONFIG` : `depot` (chemin
+du script d'envoi, `diagnostic.php` à côté de la page) et `semaines` (semaines travaillées
+par an, base du calcul).
+
+## Ce que reçoit une personne qui remplit le diagnostic
+
+Deux mails partent depuis la boîte B&L Connect :
+
+- **au visiteur** : son rapport complet dans le corps du message, plus un lien qui rouvre
+  la page sur son résultat, d'où il enregistre son PDF ;
+- **à Benjamin** : le même rapport, ses coordonnées, toutes ses réponses, et `Répondre`
+  déjà réglé sur son adresse.
+
+Pas de pièce jointe : les filtres anti-spam inspectent davantage les messages qui en
+portent, et les passerelles de sécurité des cabinets, qui sont la cible ici, sont les plus
+strictes. La recommandation constante des sources consultées est d'héberger le document et
+d'envoyer le lien.
+
+Ce lien est `?d=<code>` : tout l'état du diagnostic tient dans ce code, environ 170
+caractères, donc rien n'est conservé côté serveur et le lien reste valable tant que le
+format ne change pas (il porte un numéro de version). Un lien abîmé ramène simplement à
+l'accueil.
+
+L'adresse du lien est reconstruite **par le script**, à partir de `BL_SITE` et du seul code
+filtré. Le lien envoyé par le navigateur n'est jamais repris tel quel : sinon n'importe qui
+ferait partir l'adresse de son choix depuis la boîte B&L Connect.
+
+**Sans PHP** (GitHub Pages, hébergement statique), mettre `depot: ""` dans `CONFIG` : la
+page ouvre alors la messagerie du visiteur avec son diagnostic et son lien déjà écrits, et
+débloque quand même son rapport. Rien ne se perd, mais c'est lui qui appuie sur Envoyer.
+
+## Savoir où les visiteurs s'arrêtent
+
+Chaque écran atteint envoie une ligne à `diagnostic.php` : l'écran, un identifiant tiré au
+sort qui vit le temps de la visite, et le métier choisi. Aucun cookie, aucun stockage, rien
+qui suive quelqu'un d'une visite à l'autre.
+
+Ces lignes s'écrivent dans `mesures.php`, que le serveur refuse de servir et qui se
+récupère par FTP. Comparer le nombre de lignes `metier` et `result` donne le taux
+d'abandon, et le détail par écran dit où ça coince.
 
 ## Liens de prospection par métier
 
-Ajouter `?metier=` à l'URL fait démarrer le questionnaire directement sur les tâches
-du métier concerné, avec le vocabulaire correspondant :
+Ajouter `?metier=` à l'URL fait démarrer le questionnaire directement sur les tâches du
+métier concerné, avec le vocabulaire correspondant :
 
 | Paramètre | Métier |
 |---|---|
@@ -39,23 +107,17 @@ du métier concerné, avec le vocabulaire correspondant :
 Les appellations courantes sont rattrapées : `technique`, `maintenance`, `artisan` et
 `travaux` mènent à `batiment`, `avocat` et `notaire` à `juridique`, `rh` et `recrutement`
 à `formation`, et ainsi de suite. Un identifiant inconnu ne casse rien : le questionnaire
-reprend simplement par le choix du métier, comme sans paramètre.
-
-## Ce qui se règle en haut du fichier
-
-Dans `index.html`, chercher `var CONFIG` :
-
-- `rdv` : lien de prise de rendez-vous
-- `landing` : page visée par le QR code
-- `email` : destinataire des diagnostics envoyés
-- `semaines` : semaines travaillées par an, base du calcul
+reprend par le choix du métier, comme sans paramètre.
 
 ## Règles tenues par la page
 
 Elles ne sont pas décoratives, elles évitent de promettre ce qui ne peut pas être tenu.
 
-- Aucun gain annoncé. La page chiffre le coût actuel de la tâche, calculé sur les tranches
-  que la personne déclare elle-même.
+- Aucun gain annoncé. La page chiffre le coût actuel des tâches, sur les tranches que la
+  personne déclare elle-même, et ne dépasse jamais ce que l'effectif indiqué peut y
+  consacrer.
+- Le rapport complet est la contrepartie de l'email : tant qu'il n'est pas donné, le bouton
+  PDF reste caché et un Ctrl+P ne sort qu'un message d'invitation.
 - Aucune mention de RGPD ni de conformité.
 - Le financement CCI Oise ne s'affiche que pour l'Oise, et seulement le taux de prise en
   charge : ni le tarif du diagnostic de la CCI, qui se lirait comme le nôtre, ni les
@@ -63,82 +125,9 @@ Elles ne sont pas décoratives, elles évitent de promettre ce qui ne peut pas �
   d'acceptation reste.
 - Une seule action de sortie : l'échange découverte.
 
-## Envoi automatique du diagnostic
-
-Quand quelqu'un laisse son prénom et son email, la page envoie ses réponses à
-`netlify/functions/diagnostic.js`, qui poste deux mails depuis `benjamin@bl-connect.fr` :
-
-- au prospect : son rapport complet, à la charte, avec le lien de rendez-vous ;
-- à Benjamin : le même rapport plus toutes les réponses, avec `Répondre` pré-réglé
-  sur l'adresse du prospect.
-
-Le rapport imprimable est la contrepartie de l'email : tant qu'il n'est pas donné,
-le bouton PDF reste caché et un Ctrl+P ne sort qu'un message d'invitation.
-
-### Où la fonction doit tourner
-
-Le site étant statique, la fonction a besoin d'un hébergeur qui exécute du code :
-Netlify (ce dépôt s'y déploie tel quel), Cloudflare ou Vercel. Une fois en place,
-coller son adresse complète dans `CONFIG.depot`, en haut du script :
-
-    depot: "https://mon-site.netlify.app/.netlify/functions/diagnostic"
-
-Les en-têtes CORS sont déjà posés, la fonction accepte donc les appels venus de
-GitHub Pages. Deux variables sont à régler chez cet hébergeur :
-
-- `BL_SMTP_PASS` : le mot de passe d'appareil Infomaniak de la boîte ;
-- `BL_SITE` : l'adresse publique du diagnostic, celle de GitHub Pages, sinon le lien
-  de reprise renverrait vers l'hébergeur de la fonction.
-
-**Tant que `CONFIG.depot` est vide**, la page n'essaie pas d'envoyer : elle ouvre la
-messagerie du visiteur avec son diagnostic et son lien de reprise déjà écrits, et
-débloque son rapport. Rien ne se perd, mais c'est lui qui appuie sur Envoyer.
-
-Trois variables facultatives couvrent un changement d'hébergeur mail :
-`BL_SMTP_USER` (défaut `benjamin@bl-connect.fr`), `BL_SMTP_HOST`
-(défaut `mail.infomaniak.com`), `BL_SMTP_PORT` (défaut 587, STARTTLS).
-
-### Si l'envoi échoue
-
-La page attend douze secondes, puis ouvre la messagerie du visiteur avec le
-diagnostic prérempli, et débloque quand même son rapport. Rien n'est perdu, mais
-le mail ne part que s'il clique sur Envoyer.
-
-## Savoir où les visiteurs s'arrêtent
-
-Chaque écran atteint envoie une ligne à la fonction : l'écran, un identifiant tiré au
-sort qui vit le temps de la visite, et le métier choisi. Aucun cookie, aucun stockage,
-rien qui suive quelqu'un d'une visite à l'autre.
-
-Ces lignes ne partent que si `CONFIG.depot` est renseigné : sans fonction, pas de mesure.
-Elles se lisent alors dans les logs de l'hébergeur, en filtrant sur `DIAG-ETAPE`.
-Comparer le nombre de lignes `metier` et `result` donne le taux d'abandon, et le détail
-par écran dit où ça coince.
-
 ## Aperçu des liens partagés
 
 `partage.png` (1200 × 630) est l'image que montrent LinkedIn, WhatsApp ou un client mail
-quand le lien est collé. Elle est déclarée dans `og:image` en chemin relatif : **dès que
-l'adresse définitive du site est connue, la passer en URL absolue**
-(`https://votre-domaine/partage.png`), certains réseaux refusant les chemins relatifs.
-
-Pour la régénérer après un changement de charte, elle est produite par capture d'une page
-HTML à part, pas dessinée à la main.
-
-## Le format du diagnostic envoyé, et pourquoi
-
-Le rapport part **dans le corps du mail**, en HTML sobre, avec une version texte
-en double. Pas de pièce jointe : les filtres anti-spam appliquent une inspection
-supplémentaire aux messages qui en portent, et les passerelles de sécurité des
-cabinets, qui sont la cible ici, sont les plus strictes. La recommandation
-constante des sources consultées est d'héberger le document et d'envoyer le lien.
-
-Ce lien est le second élément : `?d=<code>` rouvre la page sur le résultat exact,
-d'où le visiteur enregistre son PDF lui-même. Tout l'état du diagnostic tient dans
-ce code, environ 170 caractères, donc rien n'est conservé de notre côté et le lien
-reste valable tant que le format ne change pas (il porte un numéro de version).
-
-L'adresse du lien est reconstruite **dans la fonction**, à partir de `BL_SITE` (ou de
-l'URL que l'hébergeur renseigne lui-même) et du seul code filtré. Le lien complet envoyé par le
-navigateur n'est jamais repris tel quel : sinon n'importe qui pourrait faire partir
-l'adresse de son choix depuis benjamin@bl-connect.fr.
+quand le lien est collé. Elle est déclarée en URL absolue dans `og:image`, à reprendre en
+cas de changement de domaine. Elle est produite par capture d'une page HTML à part, pas
+dessinée à la main.
