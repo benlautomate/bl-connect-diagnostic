@@ -14,6 +14,8 @@ const EXPEDITEUR = process.env.BL_SMTP_USER || "benjamin@bl-connect.fr";
 const HOTE = process.env.BL_SMTP_HOST || "mail.infomaniak.com";
 const PORT = Number(process.env.BL_SMTP_PORT || 587);
 const RDV = "https://calendly.com/benjcailhol/rdv-decouverte";
+// Netlify pose URL a l adresse principale du site. Sans elle, pas de lien de reprise.
+const SITE = String(process.env.URL || process.env.DEPLOY_PRIME_URL || "").replace(/\/+$/, "");
 
 const MARINE = "#011734";
 const CYAN = "#059fd9";
@@ -85,9 +87,19 @@ function rapport(d, pourBenjamin) {
        </table>`
     : "";
 
+  const reprise = d.lien
+    ? `<div style="margin-top:24px;padding:16px 18px;border:1px solid ${LIGNE};border-radius:10px">
+        <div style="font-size:14px;color:#2c3e54;line-height:1.55">
+          <a href="${d.lien}" style="color:${CYAN};font-weight:700;text-decoration:none">Revoir ce diagnostic en ligne</a><br>
+          La page rouvre votre r&eacute;sultat tel quel, et le bouton d&rsquo;enregistrement en PDF s&rsquo;y trouve.
+        </div>
+      </div>`
+    : "";
+
   const cta = pourBenjamin
-    ? ""
-    : `<div style="background:${CYAN_CLAIR};border:1px solid #b8e6f7;border-radius:10px;padding:20px;margin-top:26px">
+    ? reprise
+    : `${reprise}
+      <div style="background:${CYAN_CLAIR};border:1px solid #b8e6f7;border-radius:10px;padding:20px;margin-top:26px">
         <div style="font-size:16px;font-weight:700;color:${MARINE}">La suite tient en 30 minutes</div>
         <div style="font-size:14px;color:#2c3e54;margin-top:6px;line-height:1.55">
           Un &eacute;change d&eacute;couverte gratuit et sans engagement. Si l&rsquo;IA n&rsquo;est pas la bonne r&eacute;ponse
@@ -179,6 +191,11 @@ function versionTexte(d) {
     if (p.texte) L.push("   " + p.texte);
   });
   L.push("");
+  if (d.lien) {
+    L.push("Revoir ce diagnostic en ligne, et l enregistrer en PDF :");
+    L.push(d.lien);
+    L.push("");
+  }
   L.push("Echange decouverte, 30 minutes, gratuit : " + RDV);
   return L.join("\n");
 }
@@ -216,6 +233,11 @@ exports.handler = async function (event) {
   d.email = email;
   d.prenom = prenom;
   d.activite = String(d.activite || "Activite non precisee").slice(0, 120);
+
+  // Le lien ne vient jamais du client : on ne garde que le code, filtre, et on
+  // reconstruit l adresse a partir de celle du site.
+  const code = String(d.code || "").replace(/[^A-Za-z0-9_-]/g, "").slice(0, 3000);
+  d.lien = SITE && code ? SITE + "/?d=" + code : null;
 
   if (!process.env.BL_SMTP_PASS) {
     console.error("BL_SMTP_PASS absente des variables Netlify");

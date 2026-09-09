@@ -1832,6 +1832,69 @@ body.avec-dock{padding-bottom:5.75rem}
   /* =======================================================================
      ENVOI DU DIAGNOSTIC
      ======================================================================= */
+  /* ---------------- lien de reprise ----------------
+     L etat complet tient dans l URL : le mail n a rien a joindre, et le lien
+     reste valable sans que rien ne soit conserve de notre cote. */
+  function encoder() {
+    var brut = JSON.stringify([
+      1,
+      A.metier.id,
+      (el("fAutre") ? el("fAutre").value.trim() : ""),
+      A.taches.map(function (t) { return [t.type, FREQ.indexOf(t.freq), DUREE.indexOf(t.duree)]; }),
+      A.donnees,
+      A.etapes.id,
+      A.volume.id,
+      A.enjeux.map(function (e) { return e.id; }),
+      A.equipes.id,
+      A.suite.id,
+      TAUX.indexOf(A.taux),
+      A.dept.id
+    ]);
+    return btoa(unescape(encodeURIComponent(brut)))
+      .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  }
+
+  function decoder(code) {
+    try {
+      var d = JSON.parse(decodeURIComponent(escape(atob(
+        code.replace(/-/g, "+").replace(/_/g, "/")))));
+      if (d[0] !== 1) return false;
+
+      var metier = METIERS.filter(function (x) { return x.id === d[1]; })[0];
+      if (!metier) return false;
+      A.metier = metier;
+      if (d[2] && el("fAutre")) el("fAutre").value = d[2];
+
+      var liste = TACHES[metier.id] || TACHES.autre;
+      A.taches = (d[3] || []).map(function (x, i) {
+        var ref = liste.filter(function (y) { return y.t === x[0]; })[0];
+        return {
+          id: "t" + i, type: x[0], icon: x[0],
+          fam: (RECO_TACHE[x[0]] || RECO_TACHE.entrant).g,
+          label: ref ? ref.label : "Une autre t\u00e2che qui revient chez moi",
+          freq: FREQ[x[1]], duree: DUREE[x[2]]
+        };
+      }).filter(function (x) { return x.freq && x.duree; });
+      if (!A.taches.length) return false;
+
+      A.donnees = d[4] || [];
+      A.etapes  = ETAPES.filter(function (x) { return x.id === d[5]; })[0];
+      A.volume  = VOLUME.filter(function (x) { return x.id === d[6]; })[0];
+      A.enjeux  = (d[7] || []).map(function (id) {
+        return ENJEU.filter(function (x) { return x.id === id; })[0];
+      }).filter(Boolean);
+      A.equipes = EQUIPES.filter(function (x) { return x.id === d[8]; })[0];
+      A.suite   = SUITE.filter(function (x) { return x.id === d[9]; })[0];
+      A.taux    = TAUX[d[10]];
+      A.dept    = DEPT.filter(function (x) { return x.id === d[11]; })[0];
+
+      return !!(A.etapes && A.volume && A.equipes && A.suite && A.taux &&
+                A.dept && A.enjeux.length && A.donnees.length);
+    } catch (e) {
+      return false;
+    }
+  }
+
   /* Ce que la fonction d'envoi recoit : les reponses et le resultat affiche. */
   function dossier(prenom, mail) {
     var libre = el("fAutre") ? el("fAutre").value.trim() : "";
@@ -1841,6 +1904,7 @@ body.avec-dock{padding-bottom:5.75rem}
     return {
       prenom: prenom,
       email: mail,
+      code: encoder(),
       societe: piege ? piege.value : "",
       activite: act,
       eurLo: R.eurLo,
@@ -1993,11 +2057,29 @@ body.avec-dock{padding-bottom:5.75rem}
     el("enjeuNext").disabled = true;
     el("contexteNext").disabled = true;
     el("fPrenom").value = ""; el("fMail").value = "";
+    el("sendBtn").hidden = false;
+    if (window.history && history.replaceState) {
+      history.replaceState(null, "", window.location.pathname);
+    }
     show("intro");
   });
 
+  /* Retour depuis le mail : ?d=... rouvre le resultat tel quel. */
+  var repris = (function reprise() {
+    var code = new URLSearchParams(window.location.search).get("d");
+    if (!code || !decoder(code)) return false;
+    show("result");
+    render();
+    ouvrirRapport();          // il vient de son mail, l adresse est deja donnee
+    el("sendBtn").hidden = true;
+    el("sendHint").textContent = "Vous avez deja recu ce diagnostic par email. " +
+      "Enregistrez-le en PDF ci-dessous, ou reservez un echange.";
+    return true;
+  })();
+
   /* Lien de prospection pré-réglé : ?metier=compta */
   (function preset() {
+    if (repris) return;
     var m = new URLSearchParams(window.location.search).get("metier");
     if (!m) return;
     // Un lien deja diffuse ne se corrige plus : les appellations courantes

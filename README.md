@@ -101,3 +101,21 @@ l'adresse définitive du site est connue, la passer en URL absolue**
 
 Pour la régénérer après un changement de charte, elle est produite par capture d'une page
 HTML à part, pas dessinée à la main.
+
+## Le format du diagnostic envoyé, et pourquoi
+
+Le rapport part **dans le corps du mail**, en HTML sobre, avec une version texte
+en double. Pas de pièce jointe : les filtres anti-spam appliquent une inspection
+supplémentaire aux messages qui en portent, et les passerelles de sécurité des
+cabinets, qui sont la cible ici, sont les plus strictes. La recommandation
+constante des sources consultées est d'héberger le document et d'envoyer le lien.
+
+Ce lien est le second élément : `?d=<code>` rouvre la page sur le résultat exact,
+d'où le visiteur enregistre son PDF lui-même. Tout l'état du diagnostic tient dans
+ce code, environ 170 caractères, donc rien n'est conservé de notre côté et le lien
+reste valable tant que le format ne change pas (il porte un numéro de version).
+
+L'adresse du lien est reconstruite **dans la fonction**, à partir de `process.env.URL`
+que Netlify renseigne, et du seul code filtré. Le lien complet envoyé par le
+navigateur n'est jamais repris tel quel : sinon n'importe qui pourrait faire partir
+l'adresse de son choix depuis benjamin@bl-connect.fr.
