@@ -606,9 +606,12 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
           <span class="eyebrow">Question 7</span>
           <h2 class="q" id="enjeuQ">Quand ce n’est pas fait à temps, <span class="hl">il se passe quoi</span>&nbsp;?</h2>
         </div>
-        <p class="hint">La réponse dit ce que le sujet mérite vraiment.</p>
+        <p class="hint">Plusieurs réponses possibles : cochez tout ce qui arrive. C’est ce qui dit ce que le sujet mérite vraiment.</p>
         <div class="opts" id="optsEnjeu"></div>
-        <button class="back" data-back="volume">Revenir</button>
+        <div class="actions">
+          <button class="cta" id="enjeuNext" disabled data-go="equipes">Continuer</button>
+          <button class="back" data-back="volume">Revenir</button>
+        </div>
       </section>
 
       <section class="screen" id="s-equipes" hidden>
@@ -681,11 +684,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
           </div>
           <button class="cta ghost" id="sendBtn">Recevoir ce diagnostic</button>
           <button class="cta ghost" id="printBtn" hidden>Enregistrer mon rapport en PDF</button>
-          <form name="diagnostic" data-netlify="true" netlify-honeypot="societe" hidden>
-            <input type="text" name="prenom"><input type="email" name="email">
-            <input type="text" name="metier"><input type="text" name="montant">
-            <input type="text" name="societe"><textarea name="diagnostic"></textarea>
-          </form>
+          <input type="text" id="fSociete" name="societe" tabindex="-1" autocomplete="off" hidden aria-hidden="true">
           <p class="hint tight" id="sendHint">Vous recevez votre diagnostic complet, avec le détail tâche par tâche.</p>
           <div id="extraNotes"></div>
         </div>
@@ -719,10 +718,10 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     rdv:    "https://calendly.com/benjcailhol/rdv-decouverte",  // echange decouverte, 30 min
     email:  "benjamin@bl-connect.fr",                   // destinataire du diagnostic
     semaines: 46,                                       // semaines travaillées par an
-    // Où déposer les diagnostics reçus. "/" fonctionne tel quel si la page est
-    // hébergée sur Netlify (activer le formulaire "diagnostic" dans l'interface).
-    // Sinon, mettre ici l'adresse fournie par votre hébergeur.
-    depot:  "/"
+    // Fonction qui envoie les deux mails (le rapport au prospect, la fiche à
+    // Benjamin). Elle vit dans netlify/functions/diagnostic.js et a besoin de
+    // la variable BL_SMTP_PASS côté Netlify.
+    depot:  "/.netlify/functions/diagnostic"
   };
 
   /* =======================================================================
@@ -1032,10 +1031,10 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     { id:"v5", label:"plus de 50", v:80 }
   ];
   var ENJEU = [
-    { id:"rien",     label:"Rien de grave, ça se rattrape",        icon:"fixe",        cls:"e-1" },
-    { id:"temps",    label:"On perd du temps à rattraper",         icon:"variante",    cls:"e-2" },
-    { id:"affaires", label:"On perd des affaires",                 icon:"acquisition", cls:"e-3" },
-    { id:"risque",   label:"On prend un risque, client ou réglementaire", icon:"alerte", cls:"e-4" }
+    { id:"rien",     label:"Rien de grave, ça se rattrape",        icon:"fixe",        cls:"e-1", w:1 },
+    { id:"temps",    label:"On perd du temps à rattraper",         icon:"variante",    cls:"e-2", w:2 },
+    { id:"affaires", label:"On perd des affaires",                 icon:"acquisition", cls:"e-3", w:3 },
+    { id:"risque",   label:"On prend un risque, client ou réglementaire", icon:"alerte", cls:"e-4", w:4 }
   ];
   var EQUIPES = [
     { id:"regle",     label:"Oui, et il existe une règle écrite", icon:"ok" },
@@ -1049,7 +1048,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
      ======================================================================= */
   var A = { metier:null, taches:[], freq:null, duree:null, donnees:[],
             etapes:null, volume:null, equipes:null,
-            taux:null, dept:null, suite:null, enjeu:null };
+            taux:null, dept:null, suite:null, enjeux:[] };
 
   var ORDER = ["intro","metier","tache","rythme","donnees","etapes","volume","enjeu","equipes","contexte","result"];
   var STEPS = { metier:1, tache:2, rythme:3, donnees:4, etapes:5, volume:6, enjeu:7, equipes:8, contexte:9 };
@@ -1286,9 +1285,30 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
   });
 
   buildOpts(el("optsEnjeu"), ENJEU, { round:true, onPick: function (it, b, c) {
-    A.enjeu = it; single(c, b);
-    setTimeout(function () { show("equipes"); }, 160);
+    var i = A.enjeux.indexOf(it);
+    if (i > -1) {
+      A.enjeux.splice(i, 1);
+    } else if (it.id === "rien") {
+      A.enjeux = [it];                       // rien de grave ne se cumule avec rien
+    } else {
+      A.enjeux = A.enjeux.filter(function (x) { return x.id !== "rien"; });
+      A.enjeux.push(it);
+    }
+    Array.prototype.forEach.call(c.children, function (n) {
+      var pris = A.enjeux.some(function (x) { return x.id === n.dataset.id; });
+      n.classList.toggle("on", pris);
+    });
+    el("enjeuNext").disabled = A.enjeux.length === 0;
   }});
+
+  // Restitue les consequences de la plus grave a la moins grave.
+  function enjeuTexte() {
+    return A.enjeux.slice().sort(function (a, b) { return b.w - a.w; })
+      .map(function (e) { return e.label; }).join(" ; ");
+  }
+  function enjeuA(id) {
+    return A.enjeux.some(function (e) { return e.id === id; });
+  }
 
   buildOpts(el("optsEquipes"), EQUIPES, { round:true, onPick: function (it, b, c) {
     A.equipes = it; single(c, b);
@@ -1495,7 +1515,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
 
   function buildRecos(R) {
     var out = [], nSrc = R.num.length, v_key = R.v.key;
-    var chaud = A.enjeu && (A.enjeu.id === "affaires" || A.enjeu.id === "risque");
+    var chaud = enjeuA("affaires") || enjeuA("risque");
     if (A.volume.v <= 1) {
       out.push({ imp:2, ef:"rapide", t:"Un accès professionnel à l\u2019IA, sur vos outils",
         w:"Vous êtes seul à faire ce travail : l\u2019enjeu n\u2019est pas le cadre commun, c\u2019est d\u2019avoir un outil qui connaît vos dossiers.",
@@ -1533,7 +1553,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     }
 
     if (!seul && (A.equipes.id === "sansregle" || A.equipes.id === "inconnu")) {
-      out.push({ p:80, imp:(equipe ? 3 : 2), ef:"rapide", t:"Une charte d'usage de l'IA, écrite avec vos équipes",
+      out.push({ p:80, imp:(equipe || enjeuA("risque") ? 3 : 2), ef:"rapide", t:"Une charte d'usage de l'IA, écrite avec vos équipes",
         w:"Une demi-journée : ce qui peut entrer dans un outil d'IA, ce qui n'y entre jamais, et le document que tout le monde signe.", g:"Formation" });
       out.push({ p:78, imp:(equipe ? 3 : 2), ef:"rapide", t:"Une IA d’entreprise dans " + A.suite.nom,
         w:"Un accès d'entreprise pour l'équipe, branché sur vos outils, plus les trois cas d'usage qui servent tous les jours. Les échanges restent dans votre périmètre.",
@@ -1712,7 +1732,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
         return DONNEES.filter(function (x) { return x.id === id; })[0].label.toLowerCase();
       }).join(", ") + '. \u00c9tapes : ' + A.etapes.label.toLowerCase() +
       '. Personnes concern\u00e9es : ' + A.volume.label + '. Si ce n\u2019est pas fait : ' +
-      A.enjeu.label.toLowerCase() + '.</div>' +
+      enjeuTexte().toLowerCase() + '.</div>' +
 
       '<h2>Ce que nous vous proposons</h2>' + blocs +
 
@@ -1729,6 +1749,48 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
   /* =======================================================================
      ENVOI DU DIAGNOSTIC
      ======================================================================= */
+  /* Ce que la fonction d'envoi recoit : les reponses et le resultat affiche. */
+  function dossier(prenom, mail) {
+    var libre = el("fAutre") ? el("fAutre").value.trim() : "";
+    var act = A.metier.label.replace(/&amp;/g, "&");
+    if (A.metier.id === "autre" && libre) act += " (" + libre + ")";
+    var piege = el("fSociete");
+    return {
+      prenom: prenom,
+      email: mail,
+      societe: piege ? piege.value : "",
+      activite: act,
+      eurLo: R.eurLo,
+      eurHi: R.eurHi,
+      heures: Math.round(R.hAn),
+      plafonne: !!R.plafonne,
+      taux: A.taux.label,
+      semaines: CONFIG.semaines,
+      dept: A.dept.label,
+      verdict: { titre: R.v.title.replace(/<[^>]+>/g, ""), texte: R.v.text },
+      taches: A.taches.map(function (t) {
+        return { label: t.label, freq: t.freq.label, duree: t.duree.label,
+                 heures: Math.round(t.hAn), eurLo: t.eurLo };
+      }),
+      pistes: (PISTES || []).map(function (r) {
+        return { famille: r.g, titre: r.t, texte: r.w, eur: r.eur || 0, effort: EFFORT[r.ef] };
+      }),
+      reponses: {
+        "Information": A.donnees.map(function (id) {
+          return DONNEES.filter(function (x) { return x.id === id; })[0].label.toLowerCase();
+        }).join(", "),
+        "Étapes": A.etapes.label,
+        "Personnes concernées": A.volume.label,
+        "Si ce n'est pas fait": enjeuTexte(),
+        "IA déjà utilisée": A.equipes.label,
+        "Suite bureautique": A.suite.label,
+        "Coût horaire indiqué": A.taux.label,
+        "Localisation": A.dept.label,
+        "Conditions réunies": R.score + " sur 4"
+      }
+    };
+  }
+
   function summary() {
     var L = [];
     L.push("DIAGNOSTIC B&L CONNECT");
@@ -1746,7 +1808,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     }).join(", "));
     L.push("Étapes : " + A.etapes.label);
     L.push("Personnes concernées : " + A.volume.label);
-    L.push("Si ce n est pas fait : " + A.enjeu.label);
+    L.push("Si ce n est pas fait : " + enjeuTexte());
     L.push("IA déjà utilisée : " + A.equipes.label);
     L.push("Coût horaire indiqué : " + A.taux.label);
     L.push("Suite bureautique : " + A.suite.label);
@@ -1762,7 +1824,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     L.push(R.v.text);
     L.push("");
     L.push("VOS PISTES, CLASSEES");
-    buildRecos(R).forEach(function (r, i) {
+    (PISTES || []).forEach(function (r, i) {
       L.push((i + 1) + ". " + r.t + " [" + r.g + " | impact " + r.imp + "/3 | " + EFFORT[r.ef] + "]");
       L.push("   " + r.w);
     });
@@ -1802,31 +1864,22 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
         "&body=" + encodeURIComponent(body);
     }
 
-    var champs = {
-      "form-name":"diagnostic", prenom:p, email:m,
-      metier:A.metier.label,
-      montant:nf(R.eurLo) + " a " + nf(R.eurHi) + " EUR/an",
-      diagnostic:texte
-    };
-    var corps = Object.keys(champs).map(function (k) {
-      return encodeURIComponent(k) + "=" + encodeURIComponent(champs[k]);
-    }).join("&");
-
     hint.textContent = "Envoi en cours\u2026";
     var fini = false;
-    var secours = setTimeout(function () { if (!fini) { fini = true; parMessagerie(); } }, 4000);
+    // L'envoi passe par deux mails : on laisse au serveur le temps de les poster.
+    var secours = setTimeout(function () { if (!fini) { fini = true; parMessagerie(); } }, 12000);
 
     fetch(CONFIG.depot, {
       method:"POST",
-      headers:{ "Content-Type":"application/x-www-form-urlencoded" },
-      body:corps
+      headers:{ "Content-Type":"application/json" },
+      body:JSON.stringify(dossier(p, m))
     }).then(function (r) {
       if (fini) return;
       fini = true; clearTimeout(secours);
       if (r.ok) {
         ouvrirRapport();
-        hint.textContent = "C’est enregistré. Votre rapport complet est débloqué : " +
-          "enregistrez-le en PDF ci-dessous, et nous revenons vers vous par email.";
+        hint.textContent = "C’est envoyé. Votre diagnostic complet part sur " + m +
+          ", et votre rapport est débloqué ci-dessous.";
         el("sendBtn").disabled = true;
         el("sendBtn").textContent = "Diagnostic envoyé";
       } else { parMessagerie(); }
@@ -1841,7 +1894,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
      ======================================================================= */
   el("restart").addEventListener("click", function () {
     A = { metier:null, taches:[], freq:null, duree:null, donnees:[],
-          etapes:null, volume:null, equipes:null, taux:null, dept:null, suite:null, enjeu:null };
+          etapes:null, volume:null, equipes:null, taux:null, dept:null, suite:null, enjeux:[] };
     document.querySelectorAll(".opt.on, .chip.on").forEach(function (n) { n.classList.remove("on"); });
     var d = el("dock"); if (d) d.classList.remove("on");
     el("tacheNext").disabled = true;
@@ -1854,6 +1907,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     el("printBtn").hidden = true;
     PISTES = null;
     el("donneesNext").disabled = true;
+    el("enjeuNext").disabled = true;
     el("contexteNext").disabled = true;
     el("fPrenom").value = ""; el("fMail").value = "";
     show("intro");

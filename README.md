@@ -46,3 +46,31 @@ Elles ne sont pas décoratives, elles évitent de promettre ce qui ne peut pas �
 - Le financement CCI Oise ne s'affiche que pour l'Oise, avec ses conditions et la réserve
   d'acceptation.
 - Une seule action de sortie : l'échange découverte.
+
+## Envoi automatique du diagnostic
+
+Quand quelqu'un laisse son prénom et son email, la page envoie ses réponses à
+`netlify/functions/diagnostic.js`, qui poste deux mails depuis `benjamin@bl-connect.fr` :
+
+- au prospect : son rapport complet, à la charte, avec le lien de rendez-vous ;
+- à Benjamin : le même rapport plus toutes les réponses, avec `Répondre` pré-réglé
+  sur l'adresse du prospect.
+
+Le rapport imprimable est la contrepartie de l'email : tant qu'il n'est pas donné,
+le bouton PDF reste caché et un Ctrl+P ne sort qu'un message d'invitation.
+
+### À régler une fois sur Netlify
+
+Site settings → Environment variables → `BL_SMTP_PASS` : le mot de passe d'appareil
+Infomaniak de la boîte. Sans lui la fonction répond 500 et la page bascule sur
+l'ouverture de la messagerie du visiteur.
+
+Trois variables facultatives couvrent un changement d'hébergeur mail :
+`BL_SMTP_USER` (défaut `benjamin@bl-connect.fr`), `BL_SMTP_HOST`
+(défaut `mail.infomaniak.com`), `BL_SMTP_PORT` (défaut 587, STARTTLS).
+
+### Si l'envoi échoue
+
+La page attend douze secondes, puis ouvre la messagerie du visiteur avec le
+diagnostic prérempli, et débloque quand même son rapport. Rien n'est perdu, mais
+le mail ne part que s'il clique sur Envoyer.

@@ -1,0 +1,8 @@
+# index.html est servi tel quel a la racine, aucune etape de build.
+# La fonction d'envoi vit dans netlify/functions et part avec le deploiement.
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
