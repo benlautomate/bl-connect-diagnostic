@@ -539,7 +539,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
 
       <section class="screen" id="s-donnees" hidden>
         <div class="head"><span class="eyebrow">Question 4</span>
-          <h2 class="q">Pour faire cette tâche, l’information est où&nbsp;?</h2>
+          <h2 class="q" id="donneesQ">Pour faire ces tâches, <span class="hl">l’information est où</span>&nbsp;?</h2>
         </div>
         <p class="hint">Plusieurs réponses possibles.</p>
         <div class="opts" id="optsDonnees"></div>
@@ -551,16 +551,16 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
 
       <section class="screen" id="s-etapes" hidden>
         <div class="head"><span class="eyebrow">Question 5</span>
-          <h2 class="q">Cette tâche suit-elle toujours les mêmes étapes&nbsp;?</h2>
+          <h2 class="q" id="etapesQ">Ces tâches suivent-elles <span class="hl">toujours les mêmes étapes</span>&nbsp;?</h2>
         </div>
-        <p class="hint" id="etapesHint">Repérer, préparer, envoyer, noter.</p>
+        <p class="hint" id="etapesHint">Par exemple : repérer, préparer, envoyer, noter.</p>
         <div class="opts" id="optsEtapes"></div>
         <button class="back" data-back="donnees">Revenir</button>
       </section>
 
       <section class="screen" id="s-volume" hidden>
         <div class="head"><span class="eyebrow">Question 6</span>
-          <h2 class="q" id="volumeQ">Combien de personnes font ce travail chez vous&nbsp;?</h2>
+          <h2 class="q" id="volumeQ">Combien de personnes font <span class="hl">ce travail</span> chez vous&nbsp;?</h2>
         </div>
         <p class="hint">Vous compris.</p>
         <div class="opts grid" id="optsVolume"></div>
@@ -570,7 +570,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       <section class="screen" id="s-enjeu" hidden>
         <div class="head">
           <span class="eyebrow">Question 7</span>
-          <h2 class="q">Quand ce n’est pas fait à temps, <span class="hl">il se passe quoi</span>&nbsp;?</h2>
+          <h2 class="q" id="enjeuQ">Quand ce n’est pas fait à temps, <span class="hl">il se passe quoi</span>&nbsp;?</h2>
         </div>
         <p class="hint">La réponse dit ce que le sujet mérite vraiment.</p>
         <div class="opts" id="optsEnjeu"></div>
@@ -1201,6 +1201,19 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       el("tacheNext").textContent = A.taches.length
         ? "Continuer (" + A.taches.length + "/3)" : "Continuer";
       buildRythme();
+      var un = A.taches.length === 1;
+      el("donneesQ").innerHTML = un
+        ? "Pour faire cette tâche, <span class=\"hl\">l’information est où</span>&nbsp;?"
+        : "Pour faire ces tâches, <span class=\"hl\">l’information est où</span>&nbsp;?";
+      el("etapesQ").innerHTML = un
+        ? "Cette tâche suit-elle <span class=\"hl\">toujours les mêmes étapes</span>&nbsp;?"
+        : "Ces tâches suivent-elles <span class=\"hl\">toujours les mêmes étapes</span>&nbsp;?";
+      el("volumeQ").innerHTML = un
+        ? "Combien de personnes font <span class=\"hl\">cette tâche</span> chez vous&nbsp;?"
+        : "Combien de personnes font <span class=\"hl\">ces tâches</span> chez vous&nbsp;?";
+      el("enjeuQ").innerHTML = un
+        ? "Quand ce n’est pas fait à temps, <span class=\"hl\">il se passe quoi</span>&nbsp;?"
+        : "Quand elles ne sont pas faites à temps, <span class=\"hl\">il se passe quoi</span>&nbsp;?";
     }});
   }
 
