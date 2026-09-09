@@ -15,7 +15,9 @@ const HOTE = process.env.BL_SMTP_HOST || "mail.infomaniak.com";
 const PORT = Number(process.env.BL_SMTP_PORT || 587);
 const RDV = "https://calendly.com/benjcailhol/rdv-decouverte";
 // Netlify pose URL a l adresse principale du site. Sans elle, pas de lien de reprise.
-const SITE = String(process.env.URL || process.env.DEPLOY_PRIME_URL || "").replace(/\/+$/, "");
+// BL_SITE prime : le site public peut vivre ailleurs que la fonction (GitHub
+// Pages sert la page, cet hebergeur ne sert que l envoi).
+const SITE = String(process.env.BL_SITE || process.env.URL || process.env.DEPLOY_PRIME_URL || "").replace(/\/+$/, "");
 
 const MARINE = "#011734";
 const CYAN = "#059fd9";

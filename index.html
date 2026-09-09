@@ -10,15 +10,16 @@
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="favicon.png">
 
-<!-- Aperçu des liens partagés. og:image doit devenir une URL absolue
-     (https://votre-domaine/partage.png) dès que l’adresse du site est connue :
-     certains réseaux refusent les chemins relatifs. -->
+<!-- Aperçu des liens partagés. Les adresses sont absolues : un chemin relatif
+     serait résolu à la racine du domaine, et le site vit dans un sous-dossier.
+     À reprendre en cas de changement d’hébergeur ou de nom de domaine. -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="B&amp;L Connect">
 <meta property="og:locale" content="fr_FR">
+<meta property="og:url" content="https://benlautomate.github.io/bl-connect-diagnostic/">
 <meta property="og:title" content="Quelle tâche revient chez vous chaque semaine, et combien vous coûte-t-elle ?">
 <meta property="og:description" content="Neuf questions, deux minutes, sans inscription. Un chiffre, et ce qui est faisable chez vous.">
-<meta property="og:image" content="/partage.png">
+<meta property="og:image" content="https://benlautomate.github.io/bl-connect-diagnostic/partage.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Diagnostic B&amp;L Connect">
@@ -753,10 +754,14 @@ body.avec-dock{padding-bottom:5.75rem}
     rdv:    "https://calendly.com/benjcailhol/rdv-decouverte",  // echange decouverte, 30 min
     email:  "benjamin@bl-connect.fr",                   // destinataire du diagnostic
     semaines: 46,                                       // semaines travaillées par an
-    // Fonction qui envoie les deux mails (le rapport au prospect, la fiche à
-    // Benjamin). Elle vit dans netlify/functions/diagnostic.js et a besoin de
-    // la variable BL_SMTP_PASS côté Netlify.
-    depot:  "/.netlify/functions/diagnostic"
+    // Adresse complète de la fonction qui envoie les deux mails (le rapport au
+    // prospect, la fiche à Benjamin). GitHub Pages n’exécute aucun code : la
+    // fonction doit être hébergée ailleurs (Netlify, Cloudflare, Vercel) et son
+    // adresse collée ici, par exemple
+    // "https://mon-site.netlify.app/.netlify/functions/diagnostic".
+    // Laissée vide, la page ouvre la messagerie du visiteur avec son diagnostic
+    // préparé : rien ne se perd, mais c’est lui qui appuie sur Envoyer.
+    depot:  ""
   };
 
   /* =======================================================================
@@ -1113,7 +1118,7 @@ body.avec-dock{padding-bottom:5.75rem}
   var SID = Math.random().toString(36).slice(2, 10);
   var deja = {};
   function tracer(etape) {
-    if (deja[etape] || !navigator.sendBeacon) return;
+    if (!CONFIG.depot || deja[etape] || !navigator.sendBeacon) return;
     deja[etape] = 1;
     try {
       navigator.sendBeacon(CONFIG.depot, new Blob([JSON.stringify({
@@ -1835,6 +1840,10 @@ body.avec-dock{padding-bottom:5.75rem}
   /* ---------------- lien de reprise ----------------
      L etat complet tient dans l URL : le mail n a rien a joindre, et le lien
      reste valable sans que rien ne soit conserve de notre cote. */
+  function lienDeReprise() {
+    return window.location.origin + window.location.pathname + "?d=" + encoder();
+  }
+
   function encoder() {
     var brut = JSON.stringify([
       1,
@@ -2003,6 +2012,8 @@ body.avec-dock{padding-bottom:5.75rem}
 
     function parMessagerie() {
       ouvrirRapport();
+      // Le mail part de sa messagerie : c est nous qui glissons le lien de reprise.
+      body += "\nRevoir ce diagnostic : " + lienDeReprise() + "\n";
       hint.textContent = "Votre messagerie s’ouvre avec le diagnostic, et votre rapport est débloqué ci-dessous. " +
         "Envoyez le message pour que nous le recevions.";
       window.location.href = "mailto:" + encodeURIComponent(CONFIG.email) +
@@ -2010,6 +2021,8 @@ body.avec-dock{padding-bottom:5.75rem}
         "&subject=" + encodeURIComponent("Diagnostic B&L Connect - " + p) +
         "&body=" + encodeURIComponent(body);
     }
+
+    if (!CONFIG.depot) { parMessagerie(); return; }
 
     hint.textContent = "Envoi en cours\u2026";
     var fini = false;

@@ -7,8 +7,17 @@ Une page, aucune dépendance à installer. `index.html` se suffit à lui-même.
 
 ## Déploiement
 
-Netlify est branché sur ce dépôt : chaque push sur `main` redéploie automatiquement.
-Rien à configurer, `index.html` est servi à la racine.
+GitHub Pages sert le dépôt : chaque push sur `main` met le site à jour, à l'adresse
+https://benlautomate.github.io/bl-connect-diagnostic/ tant qu'aucun domaine propre
+n'est branché.
+
+**Le site vit dans un sous-dossier.** Toute adresse écrite en dur doit donc être soit
+relative sans barre oblique (`favicon.png`), soit absolue (`og:image`, `og:url`). Un
+chemin comme `/partage.png` serait résolu à la racine de `github.io` et renverrait une
+erreur. En cas de changement de domaine, ce sont ces deux balises du `<head>` à reprendre.
+
+**GitHub Pages n'exécute aucun code.** La fonction d'envoi (`netlify/functions/`) ne peut
+donc pas y tourner : voir la section suivante.
 
 ## Liens de prospection par métier
 
@@ -66,11 +75,24 @@ Quand quelqu'un laisse son prénom et son email, la page envoie ses réponses à
 Le rapport imprimable est la contrepartie de l'email : tant qu'il n'est pas donné,
 le bouton PDF reste caché et un Ctrl+P ne sort qu'un message d'invitation.
 
-### À régler une fois sur Netlify
+### Où la fonction doit tourner
 
-Site settings → Environment variables → `BL_SMTP_PASS` : le mot de passe d'appareil
-Infomaniak de la boîte. Sans lui la fonction répond 500 et la page bascule sur
-l'ouverture de la messagerie du visiteur.
+Le site étant statique, la fonction a besoin d'un hébergeur qui exécute du code :
+Netlify (ce dépôt s'y déploie tel quel), Cloudflare ou Vercel. Une fois en place,
+coller son adresse complète dans `CONFIG.depot`, en haut du script :
+
+    depot: "https://mon-site.netlify.app/.netlify/functions/diagnostic"
+
+Les en-têtes CORS sont déjà posés, la fonction accepte donc les appels venus de
+GitHub Pages. Deux variables sont à régler chez cet hébergeur :
+
+- `BL_SMTP_PASS` : le mot de passe d'appareil Infomaniak de la boîte ;
+- `BL_SITE` : l'adresse publique du diagnostic, celle de GitHub Pages, sinon le lien
+  de reprise renverrait vers l'hébergeur de la fonction.
+
+**Tant que `CONFIG.depot` est vide**, la page n'essaie pas d'envoyer : elle ouvre la
+messagerie du visiteur avec son diagnostic et son lien de reprise déjà écrits, et
+débloque son rapport. Rien ne se perd, mais c'est lui qui appuie sur Envoyer.
 
 Trois variables facultatives couvrent un changement d'hébergeur mail :
 `BL_SMTP_USER` (défaut `benjamin@bl-connect.fr`), `BL_SMTP_HOST`
@@ -88,7 +110,8 @@ Chaque écran atteint envoie une ligne à la fonction : l'écran, un identifiant
 sort qui vit le temps de la visite, et le métier choisi. Aucun cookie, aucun stockage,
 rien qui suive quelqu'un d'une visite à l'autre.
 
-Ces lignes se lisent sur Netlify, Logs → Functions, en filtrant sur `DIAG-ETAPE`.
+Ces lignes ne partent que si `CONFIG.depot` est renseigné : sans fonction, pas de mesure.
+Elles se lisent alors dans les logs de l'hébergeur, en filtrant sur `DIAG-ETAPE`.
 Comparer le nombre de lignes `metier` et `result` donne le taux d'abandon, et le détail
 par écran dit où ça coince.
 
@@ -115,7 +138,7 @@ d'où le visiteur enregistre son PDF lui-même. Tout l'état du diagnostic tient
 ce code, environ 170 caractères, donc rien n'est conservé de notre côté et le lien
 reste valable tant que le format ne change pas (il porte un numéro de version).
 
-L'adresse du lien est reconstruite **dans la fonction**, à partir de `process.env.URL`
-que Netlify renseigne, et du seul code filtré. Le lien complet envoyé par le
+L'adresse du lien est reconstruite **dans la fonction**, à partir de `BL_SITE` (ou de
+l'URL que l'hébergeur renseigne lui-même) et du seul code filtré. Le lien complet envoyé par le
 navigateur n'est jamais repris tel quel : sinon n'importe qui pourrait faire partir
 l'adresse de son choix depuis benjamin@bl-connect.fr.
