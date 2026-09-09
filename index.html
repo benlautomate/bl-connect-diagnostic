@@ -356,6 +356,40 @@ main{flex:1; display:flex; justify-content:center; padding:2rem 1.375rem 4rem}
 
 .reco-foot{padding:1rem 1.5rem 1.25rem; font-size:12.5px; color:var(--ink-muted); line-height:1.55; border-top:1px solid var(--line-soft); margin:0}
 
+/* ---------- rapport imprimable ---------- */
+#rapport{display:none}
+@media print{
+  @page{size:A4; margin:14mm 13mm}
+  .bg,.rail,.dock,footer,#s-result,.restart{display:none !important}
+  body{background:#fff}
+  main{padding:0; display:block}
+  .col{max-width:none}
+  #rapport{display:block; color:#011734; font-size:10.5pt; line-height:1.5}
+  #rapport .r-head{display:flex; align-items:center; gap:10mm; padding-bottom:5mm; border-bottom:2.5pt solid #011734; margin-bottom:7mm}
+  #rapport .r-head img{width:16mm; height:16mm; border-radius:50%; object-fit:cover}
+  #rapport .r-title{font-size:18pt; font-weight:800; letter-spacing:-.02em; line-height:1.1}
+  #rapport .r-sub{font-size:9pt; color:#5e6e80; margin-top:1.5mm}
+  #rapport h2{font-size:11pt; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:#059fd9; margin:8mm 0 3mm}
+  #rapport .r-big{background:#011734; color:#fff; border-radius:4mm; padding:7mm; margin-bottom:2mm; page-break-inside:avoid}
+  #rapport .r-big .n{font-size:30pt; font-weight:800; letter-spacing:-.04em; line-height:1}
+  #rapport .r-big .u{font-size:10pt; color:#b8e6f7; margin-top:2mm}
+  #rapport .r-note{font-size:8.5pt; color:#5e6e80; line-height:1.45; margin-top:3mm}
+  #rapport table{width:100%; border-collapse:collapse; font-size:9.5pt}
+  #rapport th{text-align:left; font-size:8pt; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:#5e6e80; padding:0 0 2mm; border-bottom:.5pt solid #dde4ec}
+  #rapport td{padding:2.5mm 0; border-bottom:.5pt solid #eef2f6; vertical-align:top}
+  #rapport td.num{text-align:right; font-weight:700; white-space:nowrap}
+  #rapport .r-piste{display:flex; gap:4mm; padding:3.5mm 0; border-bottom:.5pt solid #eef2f6; page-break-inside:avoid}
+  #rapport .r-piste .r-rk{flex:none; width:7mm; height:7mm; border-radius:2mm; background:#ecf8fd; color:#059fd9; font-size:9pt; font-weight:800; display:flex; align-items:center; justify-content:center}
+  #rapport .r-fam{font-size:7.5pt; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:#059fd9}
+  #rapport .r-pt{font-size:11pt; font-weight:700; letter-spacing:-.01em; margin-top:.8mm}
+  #rapport .r-pw{font-size:9pt; color:#2c3e54; margin-top:1mm}
+  #rapport .r-pm{font-size:9pt; font-weight:700; color:#059fd9; margin-top:1.5mm}
+  #rapport .r-foot{margin-top:9mm; padding-top:4mm; border-top:.5pt solid #dde4ec; font-size:8.5pt; color:#5e6e80; line-height:1.5}
+  #rapport .r-cta{background:#ecf8fd; border:.5pt solid #b8e6f7; border-radius:3mm; padding:5mm; margin-top:6mm; page-break-inside:avoid}
+  #rapport .r-cta b{font-size:11pt}
+  #rapport .r-cta div{font-size:9pt; color:#2c3e54; margin-top:1.5mm}
+}
+
 /* ---------- notes ---------- */
 .note{border-radius:18px; padding:1.1875rem 1.25rem; font-size:.9063rem; line-height:1.6; color:var(--ink-soft); border:1px solid var(--line); background:var(--surface-soft); margin-bottom:.875rem}
 .note:last-child{margin-bottom:0}
@@ -644,6 +678,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
             <div class="field"><label for="fMail">Email</label><input id="fMail" type="email" autocomplete="email" placeholder="vous@cabinet.fr"></div>
           </div>
           <button class="cta ghost" id="sendBtn">Recevoir ce diagnostic</button>
+          <button class="cta ghost" id="printBtn">Enregistrer mon rapport en PDF</button>
           <form name="diagnostic" data-netlify="true" netlify-honeypot="societe" hidden>
             <input type="text" name="prenom"><input type="email" name="email">
             <input type="text" name="metier"><input type="text" name="montant">
@@ -665,6 +700,8 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       <a class="cta" id="ctaDock" href="#" target="_blank" rel="noopener">Réserver</a>
     </div>
   </div>
+
+  <div id="rapport" aria-hidden="true"></div>
 
   <footer>
     Heures et montants calculés sur vos seules réponses. Ce n’est pas une promesse de résultat : ce qu’un système reprend réellement se détermine au cas par cas.
@@ -1529,6 +1566,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     var ro = el("recoList");
     ro.innerHTML = "";
     var pistes = buildRecos(R);
+    buildRapport(pistes);
     var maxEur = Math.max.apply(null, pistes.map(function (p) { return p.eur || 0; })) || 1;
     pistes.forEach(function (r, i) {
       var li = document.createElement("li");
@@ -1575,6 +1613,69 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     el("ctaTop").href = CONFIG.rdv;
     el("ctaDock").href = CONFIG.rdv;
     setTimeout(function () { el("dock").classList.add("on"); }, 1600);
+  }
+
+
+  /* =======================================================================
+     RAPPORT IMPRIMABLE
+     ======================================================================= */
+  function buildRapport(pistes) {
+    var d = new Date();
+    var date = d.toLocaleDateString("fr-FR", { day:"numeric", month:"long", year:"numeric" });
+    var logo = document.querySelector(".mark img");
+    var act = A.metier.label.replace(/&amp;/g, "&");
+    var libre = el("fAutre") ? el("fAutre").value.trim() : "";
+    if (A.metier.id === "autre" && libre) act += " (" + libre + ")";
+
+    var lignes = A.taches.map(function (t) {
+      return "<tr><td>" + t.label + "</td>" +
+             "<td class=\"num\">" + t.freq.label + " / sem.</td>" +
+             "<td class=\"num\">" + t.duree.label + "</td>" +
+             "<td class=\"num\">" + nf(Math.round(t.hAn)) + " h</td>" +
+             "<td class=\"num\">" + nf(t.eurLo) + " \u20ac</td></tr>";
+    }).join("");
+
+    var blocs = pistes.map(function (r, i) {
+      return '<div class="r-piste"><span class="r-rk">' + (i + 1) + '</span><div>' +
+        '<div class="r-fam">' + r.g + '</div>' +
+        '<div class="r-pt">' + r.t + '</div>' +
+        (r.w ? '<div class="r-pw">' + r.w + '</div>' : '') +
+        '<div class="r-pm">' + (r.eur ? "Jusqu\u2019\u00e0 " + nf(r.eur) + " \u20ac par an \u00b7 " : "") +
+        EFFORT[r.ef] + '</div></div></div>';
+    }).join("");
+
+    el("rapport").innerHTML =
+      '<div class="r-head">' + (logo ? '<img src="' + logo.src + '" alt="">' : '') +
+      '<div><div class="r-title">Diagnostic IA</div>' +
+      '<div class="r-sub">' + act + " \u00b7 " + date + " \u00b7 B&amp;L Connect</div></div></div>" +
+
+      '<div class="r-big"><div class="n">' + nf(R.eurLo) + ' \u20ac</div>' +
+      '<div class="u">\u00e0 r\u00e9cup\u00e9rer par an, au maximum, sur ' +
+      (A.taches.length === 1 ? "cette t\u00e2che" : "ces " + A.taches.length + " t\u00e2ches") + '</div></div>' +
+      '<div class="r-note">Soit ' + nf(Math.round(R.hAn)) + ' heures de travail par an, au co\u00fbt horaire indiqu\u00e9 (' +
+      A.taux.label + '), sur ' + CONFIG.semaines + ' semaines travaill\u00e9es. C\u2019est le maximum r\u00e9cup\u00e9rable, ' +
+      'jamais un r\u00e9sultat garanti : il reste toujours la validation et les cas particuliers.</div>' +
+
+      '<h2>Ce que vous nous avez indiqu\u00e9</h2>' +
+      '<table><tr><th>T\u00e2che</th><th class="num">Fr\u00e9quence</th><th class="num">Dur\u00e9e</th>' +
+      '<th class="num">Par an</th><th class="num">En euros</th></tr>' + lignes + '</table>' +
+      '<div class="r-note">Information disponible dans : ' +
+      A.donnees.map(function (id) {
+        return DONNEES.filter(function (x) { return x.id === id; })[0].label.toLowerCase();
+      }).join(", ") + '. \u00c9tapes : ' + A.etapes.label.toLowerCase() +
+      '. Personnes concern\u00e9es : ' + A.volume.label + '. Si ce n\u2019est pas fait : ' +
+      A.enjeu.label.toLowerCase() + '.</div>' +
+
+      '<h2>Ce que nous vous proposons</h2>' + blocs +
+
+      '<div class="r-cta"><b>La suite tient en 30 minutes</b>' +
+      '<div>Un \u00e9change d\u00e9couverte gratuit et sans engagement. Si l\u2019IA n\u2019est pas la bonne ' +
+      'r\u00e9ponse pour ce que vous avez d\u00e9crit, nous vous le disons.<br>' +
+      CONFIG.rdv + '<br>' + CONFIG.email + '</div></div>' +
+
+      '<div class="r-foot">Ce rapport reprend uniquement les r\u00e9ponses que vous avez donn\u00e9es le ' + date +
+      '. Les montants sont calcul\u00e9s sur ces d\u00e9clarations et ne constituent pas une promesse de r\u00e9sultat. ' +
+      'Le prix des solutions se chiffre s\u00e9par\u00e9ment, p\u00e9rim\u00e8tre par p\u00e9rim\u00e8tre.</div>';
   }
 
   /* =======================================================================
@@ -1624,6 +1725,8 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     L.push("Ce diagnostic repose sur les réponses ci-dessus. Il ne constitue pas une promesse de résultat.");
     return L.join("\n");
   }
+
+  el("printBtn").addEventListener("click", function () { window.print(); });
 
   el("sendBtn").addEventListener("click", function () {
     var p = el("fPrenom").value.trim();
