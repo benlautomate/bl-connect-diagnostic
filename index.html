@@ -1513,9 +1513,9 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     R = compute();
 
     countTo(el("costEur"), R.eurLo, 1250, "");
-    el("costCalc").textContent = nf(Math.round(R.hAn)) + " heures par an passées sur " +
-      (A.taches.length === 1 ? "cette tâche" : "ces " + A.taches.length + " tâches") +
-      ", au coût horaire que vous avez indiqué. Ce n\u2019est pas un prix : c\u2019est ce que ça vous coûte aujourd\u2019hui.";
+    el("costCalc").textContent = "Calculé sur vos réponses, à votre coût horaire. Ce n’est pas un prix : c’est ce que " +
+      (A.taches.length === 1 ? "cette tâche vous coûte" : "ces tâches vous coûtent") +
+      " chaque année en temps de travail.";
 
     el("vTitle").innerHTML = R.v.title;
     el("vText").textContent = R.v.text;
