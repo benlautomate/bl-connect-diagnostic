@@ -432,8 +432,12 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
 .hugenum{
   font-size:clamp(56px,15.5vw,88px); font-weight:800; letter-spacing:-.055em; line-height:.9;
   color:#fff; font-variant-numeric:tabular-nums;
+  display:inline-block; text-align:left; white-space:nowrap;
   text-shadow:0 0 60px rgba(70,189,236,.55);
+  transition:text-shadow .45s ease-out;
 }
+/* pendant le comptage, pas de halo a repeindre a chaque image */
+.hugenum.compte{text-shadow:none}
 .hugeunit{font-size:clamp(15px,3.6vw,19px); font-weight:600; color:var(--cyan-400); letter-spacing:-.01em; line-height:1.2}
 .hugesub{
   margin-top:.875rem; font-size:clamp(17px,4.4vw,21px); font-weight:700; letter-spacing:-.025em;
@@ -1324,8 +1328,10 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
 
   el("contexteNext").addEventListener("click", function () {
     if (this.disabled) return;
-    render();
+    // L ecran passe visible avant d etre rempli : sans cela le montant ne peut
+    // pas etre mesure. Tout se joue dans la meme image, rien ne clignote.
     show("result");
+    render();
   });
 
   /* =======================================================================
@@ -1335,17 +1341,36 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
 
   function countTo(node, target, ms, suffix) {
     suffix = suffix || "";
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      node.textContent = nf(target) + suffix; return;
+    var fin = nf(target) + suffix;
+
+    // La place du montant final est prise avant de compter. Sans cela la ligne
+    // s elargit a chaque chiffre gagne et pousse l unite a chaque image.
+    node.style.minWidth = "";
+    node.textContent = fin;
+    var large = node.getBoundingClientRect().width;
+    if (large) {
+      node.style.minWidth = Math.ceil(large) + "px";
+    } else {
+      // Pas de mise en page disponible : on reserve au juge, un chiffre par
+      // caractere numerique, un tiers de cadratin par separateur.
+      var chiffres = fin.replace(/[^0-9]/g, "").length;
+      node.style.minWidth = "calc(" + chiffres + "ch + " + (fin.length - chiffres) + " * .34em)";
     }
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    node.classList.add("compte");
+    node.textContent = nf(0) + suffix;
     var t0 = null;
     function step(t) {
       if (t0 === null) t0 = t;
       var p = Math.min(1, (t - t0) / ms);
       var e = 1 - Math.pow(1 - p, 3);
       node.textContent = nf(Math.round(target * e)) + suffix;
-      if (p < 1) requestAnimationFrame(step);
-      else if (node.classList) node.classList.add("pose");
+      if (p < 1) { requestAnimationFrame(step); return; }
+      node.textContent = fin;
+      node.classList.remove("compte");
+      node.classList.add("pose");
     }
     requestAnimationFrame(step);
   }
@@ -1604,6 +1629,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
   function render() {
     R = compute();
 
+    el("costEur").classList.remove("pose");
     countTo(el("costEur"), R.eurLo, 1250, "");
     el("costCalc").textContent = "C’est ce que " +
       (A.taches.length === 1 ? "cette tâche vous coûte" : "ces tâches vous coûtent") +
@@ -1644,8 +1670,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     var notes = "";
     if (A.dept.id === "oise") {
       notes += '<div class="note fin"><h4>Financement, dans l\u2019Oise</h4>' +
-        "Diagnostic 600 \u20ac HT puis 70 % des dépenses pris en charge, plafond 3 000 \u20ac HT, " +
-        "pour les entreprises de l\u2019Oise de moins de 50 salariés et moins de 7 M\u20ac de chiffre d\u2019affaires." +
+        "Un dispositif de la CCI peut prendre en charge jusqu\u2019à 70 % de la dépense." +
         '<span class="small">Nous regardons ensemble si vous y avez droit avant de vous avancer un montant.</span></div>';
     } else {
       notes += '<div class="note fin"><h4>Financement</h4>' +

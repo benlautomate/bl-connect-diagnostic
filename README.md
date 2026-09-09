@@ -43,8 +43,10 @@ Elles ne sont pas décoratives, elles évitent de promettre ce qui ne peut pas �
 - Aucun gain annoncé. La page chiffre le coût actuel de la tâche, calculé sur les tranches
   que la personne déclare elle-même.
 - Aucune mention de RGPD ni de conformité.
-- Le financement CCI Oise ne s'affiche que pour l'Oise, avec ses conditions et la réserve
-  d'acceptation.
+- Le financement CCI Oise ne s'affiche que pour l'Oise, et seulement le taux de prise en
+  charge : ni le tarif du diagnostic de la CCI, qui se lirait comme le nôtre, ni les
+  critères d'éligibilité, qui ne se tranchent pas depuis un questionnaire. La réserve
+  d'acceptation reste.
 - Une seule action de sortie : l'échange découverte.
 
 ## Envoi automatique du diagnostic
