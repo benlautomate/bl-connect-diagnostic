@@ -4,16 +4,45 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>html{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none !important}</style>
-<title>Diagnostic B&amp;L Connect</title>
+<title>Combien vous coûte la tâche qui revient chaque semaine ? | B&amp;L Connect</title>
+<meta name="description" content="Neuf questions, deux minutes, sans inscription : ce qu’une tâche récurrente vous coûte chaque année, et ce qui est faisable chez vous.">
+<meta name="theme-color" content="#011734">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
+
+<!-- Aperçu des liens partagés. og:image doit devenir une URL absolue
+     (https://votre-domaine/partage.png) dès que l’adresse du site est connue :
+     certains réseaux refusent les chemins relatifs. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="B&amp;L Connect">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:title" content="Quelle tâche revient chez vous chaque semaine, et combien vous coûte-t-elle ?">
+<meta property="og:description" content="Neuf questions, deux minutes, sans inscription. Un chiffre, et ce qui est faisable chez vous.">
+<meta property="og:image" content="/partage.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Diagnostic B&amp;L Connect">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">
 </head>
 <body>
+<noscript>
+  <div style="max-width:37rem; margin:0 auto; padding:3rem 1.375rem; font:16px/1.65 Arial,sans-serif; color:#011734">
+    <h1 style="font-size:1.5rem; margin:0 0 .75rem">Ce diagnostic a besoin de JavaScript</h1>
+    <p style="margin:0">Activez-le dans votre navigateur, ou écrivez-nous à
+    <a href="mailto:benjamin@bl-connect.fr" style="color:#059fd9">benjamin@bl-connect.fr</a> :
+    nous le faisons ensemble en trente minutes.</p>
+  </div>
+</noscript>
 <style>
 :root{
   --marine:#011734; --marine-900:#010d1f; --marine-700:#04244c; --marine-600:#0a3162;
   --cyan:#059fd9; --cyan-400:#46bdec; --cyan-200:#b8e6f7; --cyan-050:#ecf8fd;
   --amber:#d8a24a; --amber-2:#edc783; --amber-050:#fdf7ed;
-  --ink:#011734; --ink-soft:#2c3e54; --ink-muted:#5e6e80; --ink-dim:#8fa6bf;
+  --ink:#011734; --ink-soft:#2c3e54; --ink-muted:#5e6e80; --ink-dim:#607488;
   --line:#dde4ec; --line-soft:#eef2f6; --surface:#ffffff; --surface-soft:#f5f8fb;
   --on-dark:#b6c8db;
   --sans:'Poppins', Arial, system-ui, -apple-system, sans-serif;
@@ -413,6 +442,7 @@ main{flex:1; display:flex; justify-content:center; padding:2rem 1.375rem 4rem}
   border:1px solid var(--line); background:var(--surface-soft); transition:.16s;
 }
 .field input::placeholder{color:var(--ink-dim)}
+.close .field input::placeholder{color:var(--on-dark)}
 .field input:focus{outline:none; border-color:var(--cyan); background:#fff; box-shadow:0 0 0 3px rgba(5,159,217,.14)}
 .two{display:grid; grid-template-columns:1fr 1fr; gap:.75rem}
 .field input{min-width:0; width:100%}
@@ -463,6 +493,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
   transform:translateY(120%); transition:transform .3s cubic-bezier(.16,1,.3,1);
 }
 .dock.on{transform:none}
+body.avec-dock{padding-bottom:5.75rem}
 .dock-in{max-width:var(--col); margin:0 auto; display:flex; align-items:center; gap:.875rem}
 .dock-txt{flex:1; min-width:0; font-size:12.5px; font-weight:600; color:var(--ink); line-height:1.3}
 .dock-txt small{display:block; font-weight:500; color:var(--ink-muted); font-size:11.5px}
@@ -683,7 +714,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
           <a class="cta light" id="ctaRdv" href="#" target="_blank" rel="noopener">Réserver mon échange découverte</a>
           <div class="sep"></div>
           <div class="two">
-            <div class="field"><label for="fPrenom">Prénom</label><input id="fPrenom" type="text" autocomplete="given-name"></div>
+            <div class="field"><label for="fPrenom">Prénom</label><input id="fPrenom" type="text" autocomplete="given-name" placeholder="Votre prénom"></div>
             <div class="field"><label for="fMail">Email</label><input id="fMail" type="email" autocomplete="email" placeholder="vous@cabinet.fr"></div>
           </div>
           <button class="cta ghost" id="sendBtn">Recevoir ce diagnostic</button>
@@ -1076,6 +1107,21 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     });
   }
 
+  /* Mesure d audience : une ligne par ecran atteint, un identifiant tire au sort
+     qui vit le temps de la visite, aucun cookie, aucun stockage. Sert a voir ou
+     les visiteurs s arretent. Les lignes se lisent dans les logs de la fonction. */
+  var SID = Math.random().toString(36).slice(2, 10);
+  var deja = {};
+  function tracer(etape) {
+    if (deja[etape] || !navigator.sendBeacon) return;
+    deja[etape] = 1;
+    try {
+      navigator.sendBeacon(CONFIG.depot, new Blob([JSON.stringify({
+        etape: etape, sid: SID, metier: A.metier ? A.metier.id : null
+      })], { type: "application/json" }));
+    } catch (e) { /* la mesure ne doit jamais gener le visiteur */ }
+  }
+
   function show(name) {
     ORDER.forEach(function (n) {
       var s = el("s-" + n);
@@ -1092,8 +1138,12 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       count.hidden = true;
       paintBar(name === "result" ? NB_Q + 1 : 0);
     }
+    tracer(name);
     el("restart").hidden = (name !== "result");
-    if (name !== "result") { var d = el("dock"); if (d) d.classList.remove("on"); }
+    if (name !== "result") {
+      var d = el("dock"); if (d) d.classList.remove("on");
+      document.body.classList.remove("avec-dock");
+    }
     window.scrollTo({ top: 0, behavior: "instant" });
   }
 
@@ -1545,6 +1595,11 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       out.push({ imp:2, ef:"rapide", t:"Un accès professionnel à l\u2019IA, sur vos outils",
         w:"Vous êtes seul à faire ce travail : l\u2019enjeu n\u2019est pas le cadre commun, c\u2019est d\u2019avoir un outil qui connaît vos dossiers.",
         g:"IA d\u2019entreprise" });
+      // Sans equipe, ni charte ni mode operatoire commun a proposer : la
+      // troisieme piste est la mise en route elle-meme.
+      out.push({ p:60, imp:2, ef:"rapide", t:"Une prise en main sur vos propres dossiers",
+        w:"Deux heures sur vos cas réels : ce que l\u2019outil sait faire, ce qu\u2019il ne faut pas lui confier, et les usages qui tiennent une fois seul devant l\u2019écran.",
+        g:"Formation" });
     }
     A.taches.forEach(function (t) {
       var sol  = SOLUTION[t.type] || SOLUTION.entrant;
@@ -1688,7 +1743,10 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     el("ctaRdv").href = CONFIG.rdv;
     el("ctaTop").href = CONFIG.rdv;
     el("ctaDock").href = CONFIG.rdv;
-    setTimeout(function () { el("dock").classList.add("on"); }, 1600);
+    setTimeout(function () {
+      el("dock").classList.add("on");
+      document.body.classList.add("avec-dock");
+    }, 1600);
   }
 
 
@@ -1942,7 +2000,21 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
   (function preset() {
     var m = new URLSearchParams(window.location.search).get("metier");
     if (!m) return;
-    var found = METIERS.filter(function (x) { return x.id === m; })[0];
+    // Un lien deja diffuse ne se corrige plus : les appellations courantes
+    // renvoient vers la bonne famille plutot que de retomber sur le choix.
+    var ALIAS = {
+      technique:"batiment", maintenance:"batiment", artisan:"batiment", travaux:"batiment",
+      expertise:"compta", comptable:"compta", paie:"compta",
+      avocat:"juridique", notaire:"juridique", conseil:"juridique", audit:"juridique",
+      be:"etudes", ingenierie:"etudes", archi:"etudes", architecte:"etudes",
+      assurance:"courtage", immobilier:"courtage", banque:"courtage", syndic:"courtage",
+      negoce:"industrie", distribution:"industrie", industriel:"industrie",
+      logistique:"transport", supply:"transport",
+      agence:"digital", com:"digital", marketing:"digital", web:"digital", it:"digital", esn:"digital",
+      rh:"formation", recrutement:"formation", of:"formation"
+    };
+    var cle = ALIAS[m.toLowerCase()] || m.toLowerCase();
+    var found = METIERS.filter(function (x) { return x.id === cle; })[0];
     if (!found) return;
     A.metier = found;
     buildTaches();

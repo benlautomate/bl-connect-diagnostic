@@ -1,6 +1,6 @@
 # Diagnostic B&L Connect
 
-Questionnaire de 8 questions qui chiffre le coût annuel d'une tâche récurrente et propose
+Questionnaire de 9 questions qui chiffre le coût annuel d'une tâche récurrente et propose
 des solutions concrètes. Utilisé comme lead magnet en prospection.
 
 Une page, aucune dépendance à installer. `index.html` se suffit à lui-même.
@@ -17,15 +17,20 @@ du métier concerné, avec le vocabulaire correspondant :
 
 | Paramètre | Métier |
 |---|---|
-| `?metier=compta` | Cabinet comptable ou expertise |
-| `?metier=juridique` | Cabinet juridique ou conseil |
-| `?metier=etudes` | Bureau d'études, ingénierie |
-| `?metier=courtage` | Courtage, assurance, financement |
-| `?metier=formation` | Organisme de formation |
-| `?metier=technique` | Services techniques, maintenance |
-| `?metier=batiment` | Bâtiment, travaux, artisanat |
+| `?metier=compta` | Cabinet comptable & paie |
+| `?metier=juridique` | Cabinet juridique, conseil & audit |
+| `?metier=etudes` | Bureau d'études, ingénierie & architecture |
+| `?metier=courtage` | Banque, assurance, courtage & immobilier |
+| `?metier=industrie` | Industrie, négoce & distribution |
+| `?metier=transport` | Transport, logistique & supply chain |
+| `?metier=digital` | Agence & prestataires digitaux |
+| `?metier=formation` | Formation, RH & recrutement |
+| `?metier=batiment` | Bâtiment, travaux & maintenance |
 
-Sans paramètre, le questionnaire commence par le choix du métier.
+Les appellations courantes sont rattrapées : `technique`, `maintenance`, `artisan` et
+`travaux` mènent à `batiment`, `avocat` et `notaire` à `juridique`, `rh` et `recrutement`
+à `formation`, et ainsi de suite. Un identifiant inconnu ne casse rien : le questionnaire
+reprend simplement par le choix du métier, comme sans paramètre.
 
 ## Ce qui se règle en haut du fichier
 
@@ -76,3 +81,23 @@ Trois variables facultatives couvrent un changement d'hébergeur mail :
 La page attend douze secondes, puis ouvre la messagerie du visiteur avec le
 diagnostic prérempli, et débloque quand même son rapport. Rien n'est perdu, mais
 le mail ne part que s'il clique sur Envoyer.
+
+## Savoir où les visiteurs s'arrêtent
+
+Chaque écran atteint envoie une ligne à la fonction : l'écran, un identifiant tiré au
+sort qui vit le temps de la visite, et le métier choisi. Aucun cookie, aucun stockage,
+rien qui suive quelqu'un d'une visite à l'autre.
+
+Ces lignes se lisent sur Netlify, Logs → Functions, en filtrant sur `DIAG-ETAPE`.
+Comparer le nombre de lignes `metier` et `result` donne le taux d'abandon, et le détail
+par écran dit où ça coince.
+
+## Aperçu des liens partagés
+
+`partage.png` (1200 × 630) est l'image que montrent LinkedIn, WhatsApp ou un client mail
+quand le lien est collé. Elle est déclarée dans `og:image` en chemin relatif : **dès que
+l'adresse définitive du site est connue, la passer en URL absolue**
+(`https://votre-domaine/partage.png`), certains réseaux refusant les chemins relatifs.
+
+Pour la régénérer après un changement de charte, elle est produite par capture d'une page
+HTML à part, pas dessinée à la main.

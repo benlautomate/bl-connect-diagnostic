@@ -197,6 +197,17 @@ exports.handler = async function (event) {
   // Piege a robots : le champ est invisible pour un humain.
   if (d.societe) return reponse(200, { ok: true });
 
+  // Ping de mesure : un ecran atteint, rien d'autre. Se lit dans les logs de la
+  // fonction (Netlify > Logs > Functions), en filtrant sur DIAG-ETAPE.
+  if (d.etape && !d.email) {
+    console.log("DIAG-ETAPE " + JSON.stringify({
+      etape: String(d.etape).slice(0, 20),
+      sid: String(d.sid || "").slice(0, 12),
+      metier: d.metier ? String(d.metier).slice(0, 20) : null
+    }));
+    return reponse(200, { ok: true });
+  }
+
   const email = String(d.email || "").trim();
   const prenom = String(d.prenom || "").trim().slice(0, 60);
   if (!prenom || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
