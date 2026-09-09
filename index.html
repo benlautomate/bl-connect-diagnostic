@@ -382,11 +382,6 @@ main{flex:1; display:flex; justify-content:center; padding:2rem 1.375rem 4rem}
 .field input{min-width:0; width:100%}
 @media (max-width:430px){.two{grid-template-columns:1fr}}
 
-.qr-box{display:none; gap:1.125rem; align-items:center; padding-top:.25rem}
-.qr-box .qr-frame{position:relative; background:#fff; border:1px solid var(--line); padding:9px; border-radius:14px; line-height:0; flex:none; box-shadow:0 8px 24px -12px rgba(1,23,52,.4)}
-.qr-badge{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:34px; height:34px; border-radius:50%; box-shadow:0 0 0 4px #fff; object-fit:cover; display:block}
-.qr-box .hint{font-size:.8125rem}
-@media (min-width:600px){.qr-box.ready{display:flex}}
 
 footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size:12.5px; color:var(--ink-muted); line-height:1.65; position:relative; z-index:1}
 .restart{border:none; padding:.5rem 0; font-size:.8125rem; font-weight:500; color:var(--ink-muted); text-decoration:underline; text-underline-offset:4px}
@@ -455,7 +450,6 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
 .close .field input:focus{border-color:var(--cyan-400); background:var(--marine-600); box-shadow:0 0 0 3px rgba(70,189,236,.18)}
 .close .cta.ghost{background:transparent; border:1.5px solid var(--cyan-400); color:var(--cyan-400)}
 .close .cta.ghost:hover{background:rgba(70,189,236,.12)}
-.close .qr-box .hint{color:var(--cyan-200)}
 
 @media (min-width:640px){
   main{padding:2.5rem 1.5rem 4rem}
@@ -653,8 +647,6 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
           </form>
           <p class="hint tight" id="sendHint">Vous recevez le détail par mail, et nous savons vous recontacter.</p>
           <div id="extraNotes"></div>
-          <div class="qr-box" id="qrBox">
-            <div id="qrHolder"></div>
             <p class="hint tight">À scanner avec votre téléphone.</p>
           </div>
         </div>
@@ -677,7 +669,6 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
   </footer>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <script>
 (function () {
   "use strict";
@@ -687,7 +678,6 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
      ======================================================================= */
   var CONFIG = {
     rdv:    "https://calendly.com/benjcailhol/rdv-decouverte",  // echange decouverte, 30 min
-    landing:"https://www.bl-connect.fr",                // page visée par le QR (réseaux + rendez-vous)
     email:  "benjamin@bl-connect.fr",                   // destinataire du diagnostic
     semaines: 46,                                       // semaines travaillées par an
     // Où déposer les diagnostics reçus. "/" fonctionne tel quel si la page est
@@ -1582,7 +1572,6 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     el("ctaTop").href = CONFIG.rdv;
     el("ctaDock").href = CONFIG.rdv;
     setTimeout(function () { el("dock").classList.add("on"); }, 1600);
-    buildQR();
   }
 
   /* =======================================================================
@@ -1687,24 +1676,6 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       fini = true; clearTimeout(secours); parMessagerie();
     });
   });
-
-  /* =======================================================================
-     QR
-     ======================================================================= */
-  function buildQR() {
-    if (typeof qrcode !== "function") return;
-    try {
-      var q = qrcode(0, "H");
-      q.addData(CONFIG.landing);
-      q.make();
-      var badge = document.querySelector(".mark img");
-      el("qrHolder").innerHTML = '<span class="qr-frame">' + q.createSvgTag({ cellSize:5, margin:1, scalable:true }) +
-        (badge ? '<img class="qr-badge" src="' + badge.src + '" alt="">' : '') + '</span>';
-      var svg = el("qrHolder").querySelector("svg");
-      if (svg) { svg.setAttribute("width", "116"); svg.setAttribute("height", "116"); svg.style.display = "block"; }
-      el("qrBox").classList.add("ready");
-    } catch (err) { /* le QR est un bonus, jamais un blocage */ }
-  }
 
   /* =======================================================================
      REPRISE
