@@ -86,6 +86,7 @@ main{flex:1; display:flex; justify-content:center; padding:2rem 1.375rem 4rem}
 /* ---------- options ---------- */
 .opts{display:flex; flex-direction:column; gap:.5625rem}
 .opts.grid{display:grid; grid-template-columns:1fr 1fr; gap:.625rem}
+.opts.grid .opt:nth-child(5):last-child{grid-column:1/-1; flex-direction:row; align-items:center; gap:.625rem}
 .opt{
   display:flex; align-items:center; gap:.9375rem; width:100%; text-align:left;
   background:#fff; border:1px solid var(--line); border-radius:18px;
@@ -995,10 +996,11 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     { id:"rarement", label:"Non, chaque cas est différent", icon:"unique" }
   ];
   var VOLUME = [
-    { id:"v1", label:"1",         v:1 },
-    { id:"v2", label:"2 à 3",     v:2.5 },
-    { id:"v3", label:"4 à 10",    v:6 },
-    { id:"v4", label:"plus de 10", v:14 }
+    { id:"v1", label:"1",          v:1 },
+    { id:"v2", label:"2 à 5",      v:3.5 },
+    { id:"v3", label:"6 à 15",     v:10 },
+    { id:"v4", label:"16 à 50",    v:30 },
+    { id:"v5", label:"plus de 50", v:80 }
   ];
   var ENJEU = [
     { id:"rien",     label:"Rien de grave, ça se rattrape",        icon:"fixe",        cls:"e-1" },
@@ -1306,7 +1308,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       { ok:A.taches.some(function (t) { return t.freq.v >= 3; }), txt:"Au moins une revient trois fois par semaine ou plus" },
       { ok:num.length > 0,              txt:"L’information vit dans un outil, pas seulement dans les têtes" },
       { ok:A.etapes.id !== "rarement",  txt:"Les étapes sont stables d’une fois sur l’autre" },
-      { ok:A.volume.v >= 2.5,           txt:"Plusieurs personnes sont concernées" }
+      { ok:A.volume.v >= 3.5,           txt:"Plusieurs personnes sont concernées" }
     ];
     var score = conds.filter(function (c) { return c.ok; }).length;
 
@@ -1319,7 +1321,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
         title:"D’abord rendre cette information <span class=\"hl\">lisible</span>",
         text:"Un système ne lit que ce qui existe quelque part. Ni sur un drive, ni dans un logiciel aujourd’hui.",
         tag:"Première étape avant tout outil" };
-    } else if (num.length >= 3 || (A.volume.v >= 6 && num.length >= 2) || (A.volume.v >= 4 && num.length >= 2 && A.taches.length >= 2)) {
+    } else if (num.length >= 3 || (A.volume.v >= 10 && num.length >= 2) || (A.volume.v >= 3.5 && num.length >= 2 && A.taches.length >= 2)) {
       v = { key:"plateforme", eyebrow:"Ce qui est faisable chez vous",
         title:"Votre sujet, c’est <span class=\"hl\">l’éparpillement</span>",
         text:"Votre information vit à " + num.length + " endroits. Chaque tâche repaie le même coût de recherche.",
@@ -1462,11 +1464,11 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       out.push({ p:90, imp:3, ef:"long", t:"Une plateforme métier sur votre nomenclature",
         w:"Vos documents arrivent d'où qu'ils viennent, se classent par dossier et se retrouvent en une question. Construite sur votre façon de nommer les choses.", g:"Plateforme" });
     }
-    if (A.volume.v >= 4) {
+    if (A.volume.v >= 10) {
       out.push({ p:70, imp:2, ef:"moyen", t:"Une file d'entrée qualifiée",
         w:"Chaque demande arrive avec son objet, son urgence et son dossier. Vous ouvrez votre journée sur une liste déjà triée.", g:"Agent" });
     }
-    var seul = A.volume.v <= 1, equipe = A.volume.v >= 4;
+    var seul = A.volume.v <= 1, equipe = A.volume.v >= 3.5;
 
     if (equipe) {
       out.push({ imp:3, ef:"moyen", t:"Le même mode opératoire pour toute l\u2019équipe",
