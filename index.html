@@ -618,7 +618,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
           <div class="kicker">Votre diagnostic</div>
           <div class="hugewrap">
             <span class="hugenum" id="costEur">0</span>
-            <span class="hugeunit">euros par an<br>que ces tâches <b>vous coûtent</b></span>
+            <span class="hugeunit">euros par an<br><b>à récupérer</b>, au maximum</span>
           </div>
           <p class="hugenote" id="costCalc"></p>
           <a class="cta light" id="ctaTop" href="#" target="_blank" rel="noopener">Réserver mon échange découverte</a>
@@ -634,7 +634,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
             <p id="vText"></p>
           </div>
           <ol class="reco-list" id="recoList"></ol>
-          <p class="reco-foot">Les montants indiqués sont ce que ces tâches vous coûtent chaque année en temps de travail. Le prix de la solution se chiffre séparément, périmètre par périmètre.</p>
+          <p class="reco-foot">Ces montants sont ce que ces tâches vous coûtent aujourd’hui en temps de travail : c’est le maximum récupérable, jamais un résultat garanti. Le prix de la solution se chiffre séparément, périmètre par périmètre.</p>
         </div>
 
         <div class="panel close">
@@ -1526,9 +1526,9 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     R = compute();
 
     countTo(el("costEur"), R.eurLo, 1250, "");
-    el("costCalc").textContent = "Calculé sur vos réponses, à votre coût horaire. Ce n’est pas un prix : c’est ce que " +
+    el("costCalc").textContent = "C’est ce que " +
       (A.taches.length === 1 ? "cette tâche vous coûte" : "ces tâches vous coûtent") +
-      " chaque année en temps de travail.";
+      " chaque année en temps de travail, à votre coût horaire. Le maximum récupérable, jamais un résultat garanti.";
 
     el("vTitle").innerHTML = R.v.title;
     el("vText").textContent = R.v.text;
