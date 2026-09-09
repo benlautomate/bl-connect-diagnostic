@@ -388,6 +388,8 @@ main{flex:1; display:flex; justify-content:center; padding:2rem 1.375rem 4rem}
   #rapport .r-cta{background:#ecf8fd; border:.5pt solid #b8e6f7; border-radius:3mm; padding:5mm; margin-top:6mm; page-break-inside:avoid}
   #rapport .r-cta b{font-size:11pt}
   #rapport .r-cta div{font-size:9pt; color:#2c3e54; margin-top:1.5mm}
+  #rapport .r-lock{margin:60mm 0; text-align:center; font-size:12pt; font-weight:700; line-height:1.6}
+  #rapport .r-lock span{display:block; font-size:9.5pt; font-weight:400; color:#5e6e80; margin-top:3mm}
 }
 
 /* ---------- notes ---------- */
@@ -678,7 +680,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
             <div class="field"><label for="fMail">Email</label><input id="fMail" type="email" autocomplete="email" placeholder="vous@cabinet.fr"></div>
           </div>
           <button class="cta ghost" id="sendBtn">Recevoir ce diagnostic</button>
-          <button class="cta ghost" id="printBtn">Enregistrer mon rapport en PDF</button>
+          <button class="cta ghost" id="printBtn" hidden>Enregistrer mon rapport en PDF</button>
           <form name="diagnostic" data-netlify="true" netlify-honeypot="societe" hidden>
             <input type="text" name="prenom"><input type="email" name="email">
             <input type="text" name="metier"><input type="text" name="montant">
@@ -686,8 +688,6 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
           </form>
           <p class="hint tight" id="sendHint">Vous recevez votre diagnostic complet, avec le détail tâche par tâche.</p>
           <div id="extraNotes"></div>
-            <p class="hint tight">À scanner avec votre téléphone.</p>
-          </div>
         </div>
       </section>
 
@@ -985,14 +985,14 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     { label:"3 à 5",       v:4 },
     { label:"6 à 15",      v:10 },
     { label:"16 à 30",     v:22 },
-    { label:"plus de 30",  v:38 }
+    { label:"plus de 30",  v:32 }
   ];
   var DUREE = [
     { label:"moins de 10 min", v:7 },
     { label:"10 à 30 min",     v:20 },
     { label:"30 à 60 min",     v:45 },
     { label:"1 à 2 h",         v:90 },
-    { label:"plus de 2 h",     v:150 }
+    { label:"plus de 2 h",     v:130 }
   ];
   var TAUX = [
     { label:"moins de 40 €", lo:28,  hi:40 },
@@ -1335,13 +1335,26 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     return Math.max.apply(null, A.taches.map(function (t) { return t.freq.v; }));
   }
 
+  // Heures travaillees par personne et par an. Garde-fou : le temps declare ne
+  // peut pas depasser ce que les personnes concernees peuvent y consacrer.
+  var HEURES_AN = 1600;
+
   function compute() {
     var hAn = 0;
     A.taches.forEach(function (t) {
       t.hAn = t.freq.v * t.duree.v / 60 * CONFIG.semaines;
+      hAn += t.hAn;
+    });
+    var plafond  = A.volume.v * HEURES_AN;
+    var plafonne = hAn > plafond;
+    if (plafonne) {
+      var k = plafond / hAn;
+      A.taches.forEach(function (t) { t.hAn = t.hAn * k; });
+      hAn = plafond;
+    }
+    A.taches.forEach(function (t) {
       t.eurLo = round100(t.hAn * A.taux.lo);
       t.eurHi = round100(t.hAn * A.taux.hi);
-      hAn += t.hAn;
     });
     var hSem = hAn / CONFIG.semaines;
     var num  = A.donnees.filter(function (id) {
@@ -1392,7 +1405,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     }
 
     return {
-      hSem:hSem, hAn:hAn, num:num, conds:conds, score:score, v:v,
+      hSem:hSem, hAn:hAn, num:num, conds:conds, score:score, v:v, plafonne:plafonne,
       eurLo:round100(hAn * A.taux.lo), eurHi:round100(hAn * A.taux.hi)
     };
   }
@@ -1475,7 +1488,7 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
 
   var FAM_ICO = {
     "Agent":"relance", "Assistant":"doc", "Plateforme":"drive",
-    "Formation":"tetes", "IA d'entreprise":"logiciel", "Cadrage":"fixe", "Préalable":"papier"
+    "Formation":"tetes", "IA d’entreprise":"logiciel", "Cadrage":"fixe", "Préalable":"papier"
   };
 
   var EFFORT = { rapide:"Rapide", moyen:"Quelques semaines", long:"Structurant" };
@@ -1497,14 +1510,14 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     });
 
     if (nSrc === 0) {
-      out.push({ p:200, imp:3, ef:"moyen", pre:true, t:"Poser l'information quelque part de lisible",
+      out.push({ p:200, imp:3, ef:"moyen", pre:true, sk:"amont", t:"Poser l'information quelque part de lisible",
         w:"On identifie le minimum à sortir du papier et des têtes, et on le range dans un endroit que les outils peuvent lire. Rien de plus.", g:"Préalable" });
     } else if (A.donnees.indexOf("papier") > -1) {
       out.push({ p:40, imp:1, ef:"moyen", pre:true, t:"Reprendre la part encore sur papier",
         w:"Numérisation et indexation de ce qui doit entrer dans le périmètre, pour qu'il devienne exploitable. Chiffré séparément.", g:"Préalable" });
     }
-    if (nSrc >= 3) {
-      out.push({ p:90, imp:3, ef:"long", t:"Une plateforme métier sur votre nomenclature",
+    if (nSrc >= 3 || v_key === "plateforme") {
+      out.push({ p:90, imp:3, ef:"long", sk:"plateforme", t:"Une plateforme métier sur votre nomenclature",
         w:"Vos documents arrivent d'où qu'ils viennent, se classent par dossier et se retrouvent en une question. Construite sur votre façon de nommer les choses.", g:"Plateforme" });
     }
     if (A.volume.v >= 10) {
@@ -1522,21 +1535,18 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     if (!seul && (A.equipes.id === "sansregle" || A.equipes.id === "inconnu")) {
       out.push({ p:80, imp:(equipe ? 3 : 2), ef:"rapide", t:"Une charte d'usage de l'IA, écrite avec vos équipes",
         w:"Une demi-journée : ce qui peut entrer dans un outil d'IA, ce qui n'y entre jamais, et le document que tout le monde signe.", g:"Formation" });
-      out.push({ p:78, imp:(equipe ? 3 : 2), ef:"rapide", t:"Une IA d'entreprise dans " + A.suite.nom,
+      out.push({ p:78, imp:(equipe ? 3 : 2), ef:"rapide", t:"Une IA d’entreprise dans " + A.suite.nom,
         w:"Un accès d'entreprise pour l'équipe, branché sur vos outils, plus les trois cas d'usage qui servent tous les jours. Les échanges restent dans votre périmètre.",
-        g:"IA d'entreprise" });
+        g:"IA d’entreprise" });
     } else if (!seul) {
-      out.push({ p:35, imp:2, ef:"rapide", t:"Une IA d'entreprise dans " + A.suite.nom,
+      out.push({ p:35, imp:2, ef:"rapide", t:"Une IA d’entreprise dans " + A.suite.nom,
         w:"Un accès commun sur vos outils actuels, et les cas d'usage installés avec l'équipe, plutôt que des abonnements dispersés que personne n'utilise.",
-        g:"IA d'entreprise" });
+        g:"IA d’entreprise" });
     }
     if (A.etapes.id !== "toujours") {
-      out.push({ p:85, imp:2, ef:"rapide", t:"Un atelier pour écrire le chemin réel",
+      out.push({ p:85, imp:2, ef:"rapide", sk:"cadrage", t:"Un atelier pour écrire le chemin réel",
         w:"On pose les étapes, les cas particuliers et les points de validation. C'est ce document qui rend l'automatisation possible ensuite.", g:"Cadrage" });
     }
-    if (v_key === "plateforme") out = out.filter(function (o) { return o.g !== "Plateforme"; });
-    if (v_key === "agent-cadre" || v_key === "cadre") out = out.filter(function (o) { return o.g !== "Cadrage"; });
-    if (v_key === "amont") out = out.filter(function (o) { return o.t.indexOf("Poser l'information") !== 0; });
     var rang = { rapide:0, moyen:1, long:2 };
     function classe(a, b) {
       if ((b.eur || 0) !== (a.eur || 0)) return (b.eur || 0) - (a.eur || 0);
@@ -1545,9 +1555,28 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     }
     var chiffrees  = out.filter(function (o) { return o.eur; }).sort(classe);
     var transverse = out.filter(function (o) { return !o.eur; }).sort(classe);
-    return chiffrees.slice(0, 2).concat(transverse.slice(0, 1)).slice(0, 3);
+
+    // La piste de structure appelee par le verdict passe en deuxieme position.
+    // Triee au merite, elle sortait toujours derriere les taches chiffrees.
+    var SOCLE = { plateforme:"plateforme", amont:"amont",
+                  cadre:"cadrage", "agent-cadre":"cadrage" };
+    var vise  = SOCLE[v_key];
+    var socle = (vise && transverse.filter(function (o) { return o.sk === vise; })[0])
+             || transverse.filter(function (o) { return o.g === "IA d’entreprise"; })[0]
+             || transverse.filter(function (o) { return o.g === "Plateforme"; })[0]
+             || transverse[0];
+
+    var pistes = [];
+    if (chiffrees[0]) pistes.push(chiffrees[0]);
+    if (socle)        pistes.push(socle);
+    if (chiffrees[1]) pistes.push(chiffrees[1]);
+    chiffrees.concat(transverse).forEach(function (o) {
+      if (pistes.indexOf(o) < 0) pistes.push(o);
+    });
+    return pistes.slice(0, 3);
   }
   var R = null;
+  var PISTES = null;
 
   /* =======================================================================
      RENDU DU RÉSULTAT
@@ -1559,19 +1588,21 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     el("costCalc").textContent = "C’est ce que " +
       (A.taches.length === 1 ? "cette tâche vous coûte" : "ces tâches vous coûtent") +
       " chaque année en temps de travail, à votre coût horaire. Le maximum récupérable, jamais un résultat garanti.";
+    if (R.plafonne) el("costCalc").textContent += " Vos réponses dépassent le temps que l’effectif indiqué peut y consacrer : nous avons retenu ce maximum, pas le total déclaré.";
 
     el("vTitle").innerHTML = R.v.title;
     el("vText").textContent = R.v.text;
 
     var ro = el("recoList");
     ro.innerHTML = "";
-    var pistes = buildRecos(R);
-    buildRapport(pistes);
+    PISTES = buildRecos(R);
+    var pistes = PISTES;
+    verrouRapport();
     var maxEur = Math.max.apply(null, pistes.map(function (p) { return p.eur || 0; })) || 1;
     pistes.forEach(function (r, i) {
       var li = document.createElement("li");
       li.className = "reco-item" + (i === 0 ? " first" : "");
-      var chaudTag = r.pre || r.g === "Cadrage" || r.g === "Formation" || r.g === "IA d\u2019entreprise" || r.g === "IA d'entreprise";
+      var chaudTag = r.pre || r.g === "Cadrage" || r.g === "Formation" || r.g === "IA d\u2019entreprise";
       if (chaudTag) li.className += " amb";
       li.innerHTML =
         '<span class="reco-n" data-n="' + (i + 1) + '"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" ' +
@@ -1619,6 +1650,20 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
   /* =======================================================================
      RAPPORT IMPRIMABLE
      ======================================================================= */
+  // Le rapport complet est la contrepartie de l'email : tant qu'il n'est pas
+  // donne, meme un Ctrl+P ne sort que ce message.
+  function verrouRapport() {
+    el("rapport").innerHTML = '<div class="r-lock">Votre rapport complet vous attend.' +
+      '<span>Renseignez votre prénom et votre email au bas du diagnostic, ' +
+      'il devient imprimable et nous vous l’envoyons.</span></div>';
+  }
+
+  function ouvrirRapport() {
+    if (!PISTES) return;
+    buildRapport(PISTES);
+    el("printBtn").hidden = false;
+  }
+
   function buildRapport(pistes) {
     var d = new Date();
     var date = d.toLocaleDateString("fr-FR", { day:"numeric", month:"long", year:"numeric" });
@@ -1653,7 +1698,10 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       '<div class="u">\u00e0 r\u00e9cup\u00e9rer par an, au maximum, sur ' +
       (A.taches.length === 1 ? "cette t\u00e2che" : "ces " + A.taches.length + " t\u00e2ches") + '</div></div>' +
       '<div class="r-note">Soit ' + nf(Math.round(R.hAn)) + ' heures de travail par an, au co\u00fbt horaire indiqu\u00e9 (' +
-      A.taux.label + '), sur ' + CONFIG.semaines + ' semaines travaill\u00e9es. C\u2019est le maximum r\u00e9cup\u00e9rable, ' +
+      A.taux.label + '), sur ' + CONFIG.semaines + ' semaines travaill\u00e9es. ' +
+      (R.plafonne ? 'Vos r\u00e9ponses d\u00e9passent le temps que l\u2019effectif indiqu\u00e9 peut y consacrer : ' +
+        'nous avons retenu ce maximum, pas le total d\u00e9clar\u00e9. ' : '') +
+      'C\u2019est le maximum r\u00e9cup\u00e9rable, ' +
       'jamais un r\u00e9sultat garanti : il reste toujours la validation et les cas particuliers.</div>' +
 
       '<h2>Ce que vous nous avez indiqu\u00e9</h2>' +
@@ -1706,7 +1754,8 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     L.push("");
     L.push("CE QUE CETTE TÂCHE COÛTE AUJOURD HUI");
     L.push(nf(Math.round(R.hAn)) + " heures par an, soit " + nf(R.eurLo) + " à " + nf(R.eurHi) + " € par an");
-    L.push("(calcul : " + A.freq.label + " fois par semaine x " + A.duree.label + " x " + CONFIG.semaines + " semaines)");
+    L.push("(calcul sur " + CONFIG.semaines + " semaines travaillees par an, au cout horaire indique)");
+    if (R.plafonne) L.push("(total ramene au temps que l effectif indique peut y consacrer)");
     L.push("");
     L.push("CE QUI EST FAISABLE");
     L.push(R.v.title.replace(/<[^>]+>/g, ""));
@@ -1744,7 +1793,9 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
                "\n\n" + p + "\n" + m + "\n";
 
     function parMessagerie() {
-      hint.textContent = "Votre messagerie s’ouvre avec le diagnostic. Envoyez le message pour que nous le recevions.";
+      ouvrirRapport();
+      hint.textContent = "Votre messagerie s’ouvre avec le diagnostic, et votre rapport est débloqué ci-dessous. " +
+        "Envoyez le message pour que nous le recevions.";
       window.location.href = "mailto:" + encodeURIComponent(CONFIG.email) +
         "?cc=" + encodeURIComponent(m) +
         "&subject=" + encodeURIComponent("Diagnostic B&L Connect - " + p) +
@@ -1773,9 +1824,11 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
       if (fini) return;
       fini = true; clearTimeout(secours);
       if (r.ok) {
-        hint.textContent = "C\u2019est parti. Votre diagnostic complet arrive dans votre bo\u00eete.";
+        ouvrirRapport();
+        hint.textContent = "C’est enregistré. Votre rapport complet est débloqué : " +
+          "enregistrez-le en PDF ci-dessous, et nous revenons vers vous par email.";
         el("sendBtn").disabled = true;
-        el("sendBtn").textContent = "Diagnostic envoy\u00e9";
+        el("sendBtn").textContent = "Diagnostic envoyé";
       } else { parMessagerie(); }
     }).catch(function () {
       if (fini) return;
@@ -1798,6 +1851,8 @@ footer{max-width:var(--col); margin:0 auto; padding:0 1.375rem 2.5rem; font-size
     el("pairSuite").hidden = true;
     el("sendBtn").disabled = false;
     el("sendBtn").textContent = "Recevoir ce diagnostic";
+    el("printBtn").hidden = true;
+    PISTES = null;
     el("donneesNext").disabled = true;
     el("contexteNext").disabled = true;
     el("fPrenom").value = ""; el("fMail").value = "";
