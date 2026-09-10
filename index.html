@@ -718,7 +718,7 @@ body.avec-dock{padding-bottom:5.75rem}
           <a class="cta light" id="ctaRdv" href="#" target="_blank" rel="noopener">Réserver mon échange découverte <svg class="fl" width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></a>
           <div class="sep"></div>
           <div class="two">
-            <div class="field"><label for="fPrenom">Prénom</label><input id="fPrenom" type="text" autocomplete="given-name" placeholder="Votre prénom"></div>
+            <div class="field"><label for="fPrenom">Nom et prénom</label><input id="fPrenom" type="text" autocomplete="name" placeholder="Camille Durand"></div>
             <div class="field"><label for="fMail">Email</label><input id="fMail" type="email" autocomplete="email" placeholder="vous@cabinet.fr"></div>
           </div>
           <button class="cta ghost" id="sendBtn">Recevoir ce diagnostic</button>
@@ -2001,7 +2001,7 @@ body.avec-dock{padding-bottom:5.75rem}
     var m = el("fMail").value.trim();
     var hint = el("sendHint");
     if (!p || !m || m.indexOf("@") < 1) {
-      hint.textContent = "Il manque votre prénom ou votre email.";
+      hint.textContent = "Il manque votre nom ou votre email.";
       hint.style.color = "var(--amber)";
       return;
     }

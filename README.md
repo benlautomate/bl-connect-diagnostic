@@ -56,8 +56,12 @@ Deux mails partent depuis la boîte B&L Connect :
 
 - **au visiteur** : son rapport complet dans le corps du message, plus un lien qui rouvre
   la page sur son résultat, d'où il enregistre son PDF ;
-- **à Benjamin** : le même rapport, ses coordonnées, toutes ses réponses, et `Répondre`
-  déjà réglé sur son adresse.
+- **à Benjamin** : le même rapport, ses coordonnées, toutes ses réponses, `Répondre` déjà
+  réglé sur son adresse, et un bloc de données encodé que le script du CRM sait lire.
+
+Le message est écrit pour être lu sur un téléphone : chaque tâche est un bloc, pas une
+ligne de tableau à cinq colonnes, et rien ne dépend d'une media query pour rester lisible,
+certains clients les supprimant. Vérifié sans débordement jusqu'à 320 points de large.
 
 Pas de pièce jointe : les filtres anti-spam inspectent davantage les messages qui en
 portent, et les passerelles de sécurité des cabinets, qui sont la cible ici, sont les plus
@@ -131,3 +135,20 @@ Elles ne sont pas décoratives, elles évitent de promettre ce qui ne peut pas �
 quand le lien est collé. Elle est déclarée en URL absolue dans `og:image`, à reprendre en
 cas de changement de domaine. Elle est produite par capture d'une page HTML à part, pas
 dessinée à la main.
+
+## Du diagnostic à la fiche CRM
+
+Le CRM est une base locale, le diagnostic tourne sur le serveur du site : le serveur ne peut
+pas y écrire. Le pont est le mail interne, qui porte un bloc de données encodé.
+
+Côté machine de Benjamin, `AGENT_MAIL/diagnostics_vers_crm.py` lit ces mails et écrit dans
+le CRM : contact déjà connu par son email, une ligne de journal et une suite datée ; contact
+inconnu, la fiche est créée en `source=Diagnostic`, `tunnel=Entrant`, `chaleur=Hot`,
+`statut=Intéressé`, avec un rappel à deux jours ouvrés ; homonyme possible, rien n'est écrit
+et le cas part dans `a_arbitrer/`.
+
+Sans `--pour-de-vrai`, le script montre seulement ce qu'il ferait, sans rien écrire nulle part.
+
+C'est pour ce script que le formulaire demande le **nom complet** et non le seul prénom :
+sur un prénom seul, l'anti-doublon du CRM refuse la création dès qu'un homonyme existe, et
+la base en compte déjà plusieurs.

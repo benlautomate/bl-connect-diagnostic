@@ -73,15 +73,20 @@ function couper($texte, $taille)
 
 function ligneTache($t)
 {
-    $bord = 'border-bottom:1px solid #eef2f6';
-    $num  = $bord . ';text-align:right;white-space:nowrap';
-    return '<tr>'
-        . '<td style="padding:9px 0;' . $bord . ';font-size:14px;color:' . MARINE . '">' . e(champ($t, 'label')) . '</td>'
-        . '<td style="padding:9px 0;' . $num . ';font-size:13px;color:' . GRIS . '">' . e(champ($t, 'freq')) . ' / sem.</td>'
-        . '<td style="padding:9px 0;' . $num . ';font-size:13px;color:' . GRIS . '">' . e(champ($t, 'duree')) . '</td>'
-        . '<td style="padding:9px 0;' . $num . ';font-size:14px;font-weight:700;color:' . MARINE . '">' . nf(champ($t, 'heures', 0)) . ' h</td>'
-        . '<td style="padding:9px 0;' . $num . ';font-size:14px;font-weight:700;color:' . MARINE . '">' . nf(champ($t, 'eurLo', 0)) . ' &euro;</td>'
-        . '</tr>';
+    // Deux colonnes seulement : ce que c'est, ce que ca coute. Le detail passe
+    // sous le libelle, ou il reste lisible meme sur un ecran de 320 points.
+    return '<tr><td style="padding:11px 0;border-bottom:1px solid #eef2f6">'
+        . '<table width="100%" cellpadding="0" cellspacing="0"><tr>'
+        . '<td style="font-size:15px;font-weight:600;color:' . MARINE . ';line-height:1.35">'
+        . e(champ($t, 'label')) . '</td>'
+        . '<td style="font-size:15px;font-weight:700;color:' . MARINE . ';text-align:right;'
+        . 'white-space:nowrap;vertical-align:top;padding-left:10px">'
+        . nf(champ($t, 'eurLo', 0)) . '&nbsp;&euro;</td>'
+        . '</tr></table>'
+        . '<div style="font-size:13px;color:' . GRIS . ';margin-top:3px">'
+        . e(champ($t, 'freq')) . ' fois par semaine &middot; ' . e(champ($t, 'duree'))
+        . ' &middot; ' . nf(champ($t, 'heures', 0)) . ' h par an</div>'
+        . '</td></tr>';
 }
 
 function blocPiste($p, $rang)
@@ -129,7 +134,8 @@ function rapport($d, $pourBenjamin)
             . '</div></div>';
     } else {
         $entete = '<div style="font-size:15px;color:#2c3e54;line-height:1.6;margin-bottom:22px">'
-            . 'Bonjour ' . e($d['prenom']) . ',<br><br>'
+            // Le champ porte le nom complet : on ne salue qu'avec le premier mot.
+            . 'Bonjour ' . e(strtok($d['prenom'], ' ')) . ',<br><br>'
             . 'Voici le diagnostic que vous venez de remplir. Tout ce qui suit vient de vos seules '
             . 'r&eacute;ponses&nbsp;: c&rsquo;est ce que ces t&acirc;ches vous co&ucirc;tent aujourd&rsquo;hui en temps de travail.'
             . '</div>';
@@ -163,16 +169,9 @@ function rapport($d, $pourBenjamin)
             . '<div style="font-size:14px;color:#2c3e54;margin-top:6px;line-height:1.55">'
             . 'Un &eacute;change d&eacute;couverte gratuit et sans engagement. Si l&rsquo;IA n&rsquo;est pas la bonne '
             . 'r&eacute;ponse pour ce que vous avez d&eacute;crit, nous vous le disons.</div>'
-            . '<div style="margin-top:14px"><a href="' . BL_RDV . '" style="display:inline-block;background:' . MARINE
-            . ';color:#fff;text-decoration:none;font-size:15px;font-weight:700;padding:13px 22px;border-radius:8px">'
+            . '<div style="margin-top:16px"><a class="bouton" href="' . BL_RDV . '" style="display:inline-block;background:' . MARINE
+            . ';color:#fff;text-decoration:none;font-size:16px;font-weight:700;padding:15px 24px;border-radius:10px">'
             . 'R&eacute;server mon &eacute;change d&eacute;couverte</a></div></div>';
-    }
-
-    $entetes = '';
-    foreach (array('T&acirc;che' => 'left', 'Fr&eacute;q.' => 'right', 'Dur&eacute;e' => 'right',
-                   'Par an' => 'right', 'En euros' => 'right') as $titre => $cote) {
-        $entetes .= '<th style="text-align:' . $cote . ';font-size:11px;font-weight:700;letter-spacing:.08em;'
-            . 'text-transform:uppercase;color:' . GRIS . ';padding-bottom:6px;border-bottom:1px solid ' . LIGNE . '">' . $titre . '</th>';
     }
 
     $corpsTaches = '';
@@ -191,22 +190,35 @@ function rapport($d, $pourBenjamin)
             . '<div style="font-size:14px;color:#2c3e54;line-height:1.5;margin-bottom:6px">' . e(champ($d['verdict'], 'texte')) . '</div>';
     }
 
-    return '<!doctype html><html lang="fr"><body style="margin:0;padding:0;background:#f4f7fa">'
-        . '<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f7fa;padding:24px 12px"><tr><td align="center">'
-        . '<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#fff;border-radius:14px;padding:30px;font-family:' . POLICE . '">'
+    return '<!doctype html><html lang="fr"><head>'
+        . '<meta charset="utf-8">'
+        . '<meta name="viewport" content="width=device-width, initial-scale=1">'
+        . '<style>'
+        . '@media only screen and (max-width:600px){'
+        . '  .cadre{padding:20px 16px !important}'
+        . '  .marge{padding:12px 6px !important}'
+        . '  .gros{font-size:34px !important}'
+        . '  .titre{font-size:19px !important}'
+        . '  .bouton{display:block !important; text-align:center !important}'
+        . '}'
+        . '</style></head>'
+        . '<body style="margin:0;padding:0;background:#f4f7fa;-webkit-text-size-adjust:100%">'
+        . '<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f7fa"><tr>'
+        . '<td class="marge" align="center" style="padding:24px 12px">'
+        . '<table width="600" cellpadding="0" cellspacing="0" class="cadre" style="max-width:600px;width:100%;background:#fff;border-radius:14px;padding:30px;font-family:' . POLICE . '">'
 
         . '<tr><td style="padding-bottom:18px;border-bottom:2px solid ' . MARINE . '">'
-        . '<div style="font-size:21px;font-weight:800;color:' . MARINE . ';letter-spacing:-.02em">Diagnostic IA</div>'
+        . '<div class="titre" style="font-size:22px;font-weight:800;color:' . MARINE . ';letter-spacing:-.02em">Diagnostic IA</div>'
         . '<div style="font-size:13px;color:' . GRIS . ';margin-top:3px">' . e($d['activite']) . ' &middot; ' . $date . ' &middot; B&amp;L Connect</div>'
         . '</td></tr>'
 
         . '<tr><td style="padding-top:22px">' . $entete . '</td></tr>'
 
         . '<tr><td><div style="background:' . MARINE . ';border-radius:12px;padding:24px;color:#fff">'
-        . '<div style="font-size:38px;font-weight:800;letter-spacing:-.03em;line-height:1">' . nf(champ($d, 'eurLo', 0)) . ' &euro;</div>'
-        . '<div style="font-size:14px;color:#b8e6f7;margin-top:6px">&agrave; r&eacute;cup&eacute;rer par an, au maximum, sur '
+        . '<div class="gros" style="font-size:40px;font-weight:800;letter-spacing:-.03em;line-height:1.05">' . nf(champ($d, 'eurLo', 0)) . ' &euro;</div>'
+        . '<div style="font-size:15px;color:#b8e6f7;margin-top:8px;line-height:1.45">&agrave; r&eacute;cup&eacute;rer par an, au maximum, sur '
         . ($nbT === 1 ? 'cette t&acirc;che' : 'ces ' . $nbT . ' t&acirc;ches') . '</div></div>'
-        . '<div style="font-size:12.5px;color:' . GRIS . ';line-height:1.5;margin-top:10px">'
+        . '<div style="font-size:13.5px;color:' . GRIS . ';line-height:1.55;margin-top:12px">'
         . 'Soit ' . nf(champ($d, 'heures', 0)) . ' heures de travail par an, au co&ucirc;t horaire indiqu&eacute; ('
         . e(champ($d, 'taux')) . '), sur ' . e(champ($d, 'semaines', 46)) . ' semaines travaill&eacute;es. ' . $plafond
         . 'C&rsquo;est le maximum r&eacute;cup&eacute;rable, jamais un r&eacute;sultat garanti&nbsp;: il reste toujours '
@@ -214,7 +226,7 @@ function rapport($d, $pourBenjamin)
 
         . '<tr><td><h2 style="font-size:13px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:' . CYAN . ';margin:26px 0 8px">'
         . 'Ce que ' . ($pourBenjamin ? 'cette personne a' : 'vous nous avez') . ' indiqu&eacute;</h2>'
-        . '<table width="100%" cellpadding="0" cellspacing="0"><tr>' . $entetes . '</tr>' . $corpsTaches . '</table></td></tr>'
+        . '<table width="100%" cellpadding="0" cellspacing="0">' . $corpsTaches . '</table></td></tr>'
 
         . '<tr><td><h2 style="font-size:13px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:' . CYAN . ';margin:26px 0 4px">'
         . ($pourBenjamin ? 'Ce que la page a propos&eacute;' : 'Ce que nous vous proposons') . '</h2>'
@@ -232,6 +244,50 @@ function rapport($d, $pourBenjamin)
         . '</div></td></tr>'
 
         . '</table></td></tr></table></body></html>';
+}
+
+/**
+ * Bloc lu par le script qui alimente le CRM. Encode, decoupe en lignes de 76
+ * caracteres : une ligne longue serait recoupee au transport et le contenu
+ * deviendrait illisible.
+ */
+function blocCrm($d)
+{
+    $utile = array(
+        'prenom'   => champ($d, 'prenom'),
+        'email'    => champ($d, 'email'),
+        'activite' => champ($d, 'activite'),
+        'dept'     => champ($d, 'dept'),
+        'eurLo'    => (int) champ($d, 'eurLo', 0),
+        'eurHi'    => (int) champ($d, 'eurHi', 0),
+        'heures'   => (int) champ($d, 'heures', 0),
+        'plafonne' => (bool) champ($d, 'plafonne'),
+        'taux'     => champ($d, 'taux'),
+        'lien'     => champ($d, 'lien'),
+        'verdict'  => champ($d, 'verdict') ? champ($d['verdict'], 'titre') : '',
+        'taches'   => array(),
+        'pistes'   => array(),
+        'reponses' => champ($d, 'reponses', array()),
+    );
+    foreach (champ($d, 'taches', array()) as $t) {
+        $utile['taches'][] = array(
+            'label'  => champ($t, 'label'),
+            'freq'   => champ($t, 'freq'),
+            'duree'  => champ($t, 'duree'),
+            'heures' => (int) champ($t, 'heures', 0),
+            'eurLo'  => (int) champ($t, 'eurLo', 0),
+        );
+    }
+    foreach (champ($d, 'pistes', array()) as $pi) {
+        $utile['pistes'][] = array(
+            'famille' => champ($pi, 'famille'),
+            'titre'   => champ($pi, 'titre'),
+            'eur'     => (int) champ($pi, 'eur', 0),
+            'effort'  => champ($pi, 'effort'),
+        );
+    }
+    $code = base64_encode(json_encode($utile, JSON_UNESCAPED_UNICODE));
+    return "--- CRM ---\n" . chunk_split($code, 76, "\n") . "--- FIN CRM ---";
 }
 
 function versionTexte($d)
@@ -362,7 +418,7 @@ try {
         BL_MAIL, 'B&L Connect',
         'Diagnostic - ' . $d['activite'] . ' - ' . $d['prenom'] . ' (' . $montant . ')',
         rapport($d, true),
-        $texte . "\n\n" . $d['prenom'] . ' - ' . $d['email'],
+        $texte . "\n\n" . $d['prenom'] . ' - ' . $d['email'] . "\n\n" . blocCrm($d),
         array($d['email'], $d['prenom']),
         'Diagnostic B&L Connect'
     );
