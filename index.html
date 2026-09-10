@@ -184,6 +184,8 @@ main{flex:1; display:flex; justify-content:center; padding:2rem 1.375rem 4rem}
 }
 .cta:hover{background:#0489bd; box-shadow:0 14px 32px rgba(5,159,217,.38)}
 .cta:active{transform:scale(.99)}
+.cta .fl{flex:none; transition:transform .18s}
+.cta:hover .fl{transform:translateX(3px)}
 .cta[disabled]{background:var(--line-soft); color:var(--ink-dim); box-shadow:none; cursor:not-allowed}
 .cta.ghost{background:#fff; color:var(--cyan); border:1.5px solid var(--cyan); box-shadow:none}
 .cta.ghost:hover{background:var(--cyan-050)}
@@ -558,12 +560,13 @@ body.avec-dock{padding-bottom:5.75rem}
           <h1>Quelle tâche revient chez vous chaque semaine, et <span class="hl">combien vous coûte-t-elle</span>&nbsp;?</h1>
           <p class="lede">Neuf questions. Un chiffre, et ce qui est faisable chez vous.</p>
           <div class="facts">
+            <span>Deux agents actifs chez un éditeur de logiciel</span>
             <span>Oise et Val-d’Oise en présentiel</span>
             <span>France entière à distance</span>
             <span>Un interlocuteur unique</span>
           </div>
         </div>
-        <button class="cta" data-go="metier">Commencer</button>
+        <button class="cta" data-go="metier">Commencer <svg class="fl" width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></button>
         <p class="hint">Le temps passé le soir à finir vos dossiers ne figure sur aucune ligne de votre comptabilité.</p>
       </section>
 
@@ -694,9 +697,9 @@ body.avec-dock{padding-bottom:5.75rem}
             <span class="hugeunit">euros par an<br><b>à récupérer</b>, au maximum</span>
           </div>
           <p class="hugenote" id="costCalc"></p>
-          <a class="cta light" id="ctaTop" href="#" target="_blank" rel="noopener">Réserver mon échange découverte</a>
+          <a class="cta light" id="ctaTop" href="#" target="_blank" rel="noopener">Réserver mon échange découverte <svg class="fl" width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></a>
           <div class="proof">
-            <span><span class="stars">★★★★★</span> 5,0 sur Google, 7 avis</span>
+            <span><span class="stars">★★★★★</span> Note Google 5/5, 7 avis</span>
             <span>30 minutes, gratuit</span>
           </div>
         </div>
@@ -712,7 +715,7 @@ body.avec-dock{padding-bottom:5.75rem}
 
         <div class="panel close">
           <h2>Deux façons de <span class="hl">continuer</span></h2>
-          <a class="cta light" id="ctaRdv" href="#" target="_blank" rel="noopener">Réserver mon échange découverte</a>
+          <a class="cta light" id="ctaRdv" href="#" target="_blank" rel="noopener">Réserver mon échange découverte <svg class="fl" width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></a>
           <div class="sep"></div>
           <div class="two">
             <div class="field"><label for="fPrenom">Prénom</label><input id="fPrenom" type="text" autocomplete="given-name" placeholder="Votre prénom"></div>
@@ -732,7 +735,7 @@ body.avec-dock{padding-bottom:5.75rem}
   <div class="dock" id="dock">
     <div class="dock-in">
       <div class="dock-txt">30 minutes, gratuit<small>Si l’IA n’est pas la réponse, nous le disons</small></div>
-      <a class="cta" id="ctaDock" href="#" target="_blank" rel="noopener">Réserver</a>
+      <a class="cta" id="ctaDock" href="#" target="_blank" rel="noopener">Réserver <svg class="fl" width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10h11M11 6l4 4-4 4"/></svg></a>
     </div>
   </div>
 
