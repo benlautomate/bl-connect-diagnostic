@@ -19,7 +19,8 @@ C'est tout. L'hébergement web IONOS du site couvre les deux.
 
 ## Le dossier à déposer
 
-Dépôt : **github.com/benlautomate/bl-connect-diagnostic** — bouton `Code` → `Download ZIP`.
+Tu l'as reçu en ZIP. Il vient du dépôt **github.com/benlautomate/bl-connect-diagnostic**,
+si tu préfères y récupérer la dernière version.
 
 Emplacement prévu : un sous-dossier du site, `/diagnostic/`, pour que l'adresse publique
 soit `https://www.bl-connect.fr/diagnostic/`.
@@ -81,9 +82,9 @@ Le reste est en chemins relatifs et suit le dossier tout seul.
 
 ## Deux choses à ne pas faire
 
-- **Ne pas committer `config.php` sur GitHub.** Le dépôt est public et ce fichier porte le
-  mot de passe de la boîte mail. Il est déjà dans `.gitignore`, il suffit de ne pas l'en
-  sortir.
+- **`config.php` ne quitte pas le serveur.** Il porte le mot de passe de la boîte mail : ni
+  renvoyé par mail, ni déposé sur un partage, ni publié sur le dépôt, qui est public. Le
+  `.gitignore` fourni l'exclut déjà.
 - **Ne pas laisser `verification.php`** une fois la vérification faite.
 
 ## Si quelque chose ne marche pas
